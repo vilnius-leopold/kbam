@@ -25,6 +25,7 @@ class Kbam
 		# meta data
 		@last_query = nil
 		@count_query = nil
+		@result = nil
 
 		
 		# offer block syntax
@@ -134,8 +135,11 @@ class Kbam
 
 	
 
-	def get		
-		return @client.query(compose_query)
+	def get
+
+		@result = @client.query(compose_query)
+
+		return @result
 	end
 
 	# if instance method 
@@ -146,12 +150,32 @@ class Kbam
 
 		puts "OBJECT TYPE: #{self.class}"
 
-		get.each do |item|
-			yield item
+		if self.class == Kbam
+
+			items = get
+
+			if items != nil
+				items.each do |item|
+					yield item
+				end
+			else
+				puts "Empty result"
+			end
+
+		else
+			puts "No Kbam object found!"
 		end
 	end
 
 	def count
+		if @result != nil
+			return @result.count
+		else
+			return nil
+		end
+	end
+
+	def total
 		unless @count_query == nil
 			total =  @client.query(@count_query).first["count"]
 			puts "TOTAL COUNT: #{total}"
@@ -161,6 +185,10 @@ class Kbam
 			return nil
 		end
 		
+	end
+
+	def sql
+		return compose_query
 	end
 
 
@@ -225,7 +253,7 @@ class Kbam
 		unless @from == ""
 			"FROM #{@from}"
 		else
-			error('No table specifiyed!')
+			error('No table specifiyed')
 		end
 	end
 
