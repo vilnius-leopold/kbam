@@ -175,6 +175,8 @@ class Kbam
 		end
 	end
 
+	alias_method :length, :count
+
 	def total
 		unless @count_query == nil
 			total =  @client.query(@count_query).first["count"]
@@ -190,6 +192,11 @@ class Kbam
 	def sql
 		return compose_query
 	end
+
+	alias_method :to_s, :sql
+	alias_method :to_str, :sql
+	alias_method :to_sql, :sql
+
 
 
 	##################
