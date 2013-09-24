@@ -1,5 +1,6 @@
 TODO
 - merge office modifications
+- fix count issue (related to group/ having?)
 
 - query + execute
 - insert
