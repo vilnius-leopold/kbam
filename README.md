@@ -7,7 +7,7 @@ K'bam! is MySQL query string builder, featuring statement chaining and ?-escapin
 ### What it does
 
 it turns this 
-``` 
+```ruby
 	Kbam.new.from('posts')
 		.select('title, author, date, text')
 		.limit(10)
@@ -15,7 +15,7 @@ it turns this
 		.where('author = ?', 'john')
 ```
 into this
-``` 
+```sql
 SELECT title, author, date, text FROM posts WHERE author = 'john' ORDER BY date ASC LIMIT 10 
 ```
 
@@ -33,7 +33,7 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 
 
 #### Nested queries
-```
+```ruby
 	nested_where = Kbam.new.where('user_name = ?', 'Olympia').and('id = ?', 120)
 
 	comment_query = Kbam.new.from(:comments)
@@ -48,18 +48,43 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 ```
 ### Functions
 
+#### select
+
+```ruby
+.select("fullname AS name", ["age", "birth"])	# can take array, single and multiple arguments
+
+#=> SELECT fullname AS name, age, birth
+
+# if empty or omitted
+#=> SELECT *
+
+```
+
+
 #### where
 
-```
-	string = "user_name = ?" # or also: "user_name = ? AND id = ?"
-	vars = "john" # can take array, single and multiple arguments
+```ruby
+string = "user_name = ?" 	# or also: "user_name = ? AND id = ?"
+vars = "john" 				# can take array, single and multiple arguments
 
-	.where(string, vars)
-	
-	#=> WHERE user_name = 'john'
+.where(string, vars)
+
+#=> WHERE ... AND user_name = 'john'
 ```
 Aliases  
-		.and(string, vars)
+`.and`
+
+#### or_where
+
+```ruby
+
+.or_where(string, vars)
+
+#=> WHERE ... OR user_name = 'john'
+```
+Aliases  
+`.or`
+`.where_or`
 
 
 
