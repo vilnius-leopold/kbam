@@ -1,7 +1,7 @@
 K'bam!
 ======
 
-### Description
+## Description
 K'bam! is MySQL query string builder, featuring statement chaining and ?-escaping.
 
 ### What it does
@@ -19,10 +19,10 @@ into this
 SELECT title, author, date, text FROM posts WHERE author = 'john' ORDER BY date ASC LIMIT 10 
 ```
 
-### For whom is K'bam!?
+## For whom is K'bam!?
 K'bam! is for those that feel comfortable with raw SQL statements, but don't want to go into the effort of sanatizing every variable and want to enjoy the convenience of random (order) statement chaining.
 
-###Features
+##Features
 - random (order) statement chaining
 - variable sanatization
 - you are not forced to use any defined database structure as required by many ORMs
@@ -30,7 +30,7 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - K'bam! has no uneccassary overhead and provides full access and suport for MySQL through the mysql2 apdater.
 - nested queries
 
-
+## Examples
 
 #### Nested queries
 ```ruby
@@ -46,7 +46,8 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 	#Isn't that f***ing awesome!?
 
 ```
-### Functions
+
+## Functions
 
 ### Composing Functions
 
@@ -132,7 +133,18 @@ Kbam.new.from("posts").limit(10).total
 #=> 327
 ```
 
-### The reason to build K'bam!
+### Helper Functions
+
+#### escape
+
+```ruby
+# escapes string
+Kbam.escape(dirty_string)
+```
+Aliases  
+`.esc`
+
+## The reason to build K'bam!
 I tried Datamapper, ActiveRecord and Sequel when working on a project. The database requirements for this project were rather simple, but for some reason all these ORMs had trouble with the one or the other MySQL / Databse feature. Either they didn't support the following or to achieve it, it needed a big work around that would have been extremely simple in raw MySQL. And on top - they where often slow.
 - using String as a primary key
 - multiple join tables
