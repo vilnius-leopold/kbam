@@ -48,10 +48,16 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 ```
 ### Functions
 
+### Composing Functions
+
 #### select
 
 ```ruby
-.select("fullname AS name", ["age", "birth"])	# can take array, single and multiple arguments
+# can take array, single and multiple arguments
+.select("fullname AS name", ["age", "birth"])
+
+# or chain it
+.select("fullname AS name").select(["age", "birth"])
 
 #=> SELECT fullname AS name, age, birth
 
@@ -83,10 +89,48 @@ Aliases
 #=> WHERE ... OR user_name = 'john'
 ```
 Aliases  
-`.or`
+`.or`  
 `.where_or`
 
+### Retrieving Functions
 
+#### get
+
+```ruby
+# retrieves posts
+posts = Kbam.new.from("posts").get
+#=> 10
+```
+Aliases  
+`.fetch`
+
+#### each
+
+```ruby
+# no need to call get before each
+Kbam.new.from("posts").each do |post|
+	puts post
+end
+#=> 10
+```
+
+#### count
+
+```ruby
+# counts only posts in current result set
+Kbam.new.from("posts").limit(10).count
+#=> 10
+```
+Aliases  
+`.length`
+
+#### total
+
+```ruby
+# counts all posts irrespective of the current resultset
+Kbam.new.from("posts").limit(10).total
+#=> 327
+```
 
 ### The reason to build K'bam!
 I tried Datamapper, ActiveRecord and Sequel when working on a project. The database requirements for this project were rather simple, but for some reason all these ORMs had trouble with the one or the other MySQL / Databse feature. Either they didn't support the following or to achieve it, it needed a big work around that would have been extremely simple in raw MySQL. And on top - they where often slow.
