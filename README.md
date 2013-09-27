@@ -28,6 +28,40 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - you are not forced to use any defined database structure as required by many ORMs
 - K'bam! is fast and does't constrain you.
 - K'bam! has no uneccassary overhead and provides full access and suport for MySQL through the mysql2 apdater.
+- nested queries
+
+
+
+#### Nested queries
+```
+	nested_where = Kbam.new.where('user_name = ?', 'Olympia').and('id = ?', 120)
+
+	comment_query = Kbam.new.from(:comments)
+		.limit(10)
+		.order(:created)
+		.where('user_name = ?', 'john').or(nested_where)
+	
+	#=> SELECT * FROM comments WHERE user_name = 'john' OR (user_name = 'Olympia' AND id = 120) ORDER BY `created` ASC LIMIT 10
+
+	#Isn't that f***ing awesome!?
+
+```
+### Functions
+
+#### where
+
+```
+	string = "user_name = ?" # or also: "user_name = ? AND id = ?"
+	vars = "john" # can take array, single and multiple arguments
+
+	.where(string, vars)
+	
+	#=> WHERE user_name = 'john'
+```
+Aliases  
+		.and(string, vars)
+
+
 
 ### The reason to build K'bam!
 I tried Datamapper, ActiveRecord and Sequel when working on a project. The database requirements for this project were rather simple, but for some reason all these ORMs had trouble with the one or the other MySQL / Databse feature. Either they didn't support the following or to achieve it, it needed a big work around that would have been extremely simple in raw MySQL. And on top - they where often slow.
@@ -40,3 +74,4 @@ I tried Datamapper, ActiveRecord and Sequel when working on a project. The datab
 - using a MySQL function in a SELECT or WHERE statement
 - renaming fields (using AS)
 - counting entire dataset (using SQL_CALC_FOUND_ROWS)
+- nested select statements SELECT ... FROM (SELECT ... FROM ...) AS t 
