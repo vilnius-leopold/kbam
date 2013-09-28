@@ -1,19 +1,7 @@
-
-class String
-
-	@sql_where_type = "and" # :and, :or
-
-	def sql_where_type
-		puts "GET WHERE: #{@sql_where_type}"
-		@sql_where_type
-	end
-
-	def set_sql_where_type(type)
-		@sql_where_type = type
-		puts "SET WHERE: #{@sql_where_type}"
-	end
-end
-
+# some syntax sugar 
+# added to the String and Symbol class
+# to handle sql operator
+# <= >= < > .like
 
 class String
 

@@ -2,15 +2,16 @@
 
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
-require_relative 'class_tweaks' # provides insanely simple syntax
-
+#require_relative 'class_tweaks' # provides insanely simple syntax
+require_relative 'kbam/extension'
+#require_relative 'kbam/sugar'
 
 class Kbam
 	attr_reader :is_nested
   	attr_writer :is_nested
 	
-	@@client = nil
-	@@wheres = Array.new
+	@@client = nil	
+	@@sugar = false
 	
 	def initialize(login_credentials = nil)
 
@@ -69,6 +70,15 @@ class Kbam
 		else
 			puts "you are already connected!"
 		end
+	end
+
+	def self.sugar?
+		return @@sugar
+	end
+
+	def self.sugar_please!
+		@@sugar = true
+		require_relative 'kbam/sugar'
 	end
 
 	# where API

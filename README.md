@@ -90,7 +90,12 @@ Kbam.new.from(sub_query.as("sub_table"))
 
 #### Syntax sugar (still experimental)
 ```ruby
-# you can use >= <= < > in where clauses 
+# you can use >= <= < > in where clauses
+# by default sugar is turned off
+# to turn it on just type:
+Kbam.sugar_please!
+
+# query with sugar ;)
 Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
 
 #=> SELECT * FROM comments WHERE `user_name` = 'Olympia' AND `id` >= 120
