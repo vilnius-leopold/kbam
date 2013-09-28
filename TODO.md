@@ -4,7 +4,7 @@ TODO
 - [x] add some docs
 - [ ] add some more docs
 - [x] add lincens --> is MIT the best solution?
-- [ ] add alias for get: fetch
+- [x] add alias for get: fetch
 - [x] find solution for nested queries (nested query string insertion --> hashtag --> no escape?!) --> Kbam class functions? --> empty after .slq call?
 - [ ] finish implementing nested queries
 - [ ] query hooks? insert raw sql in between query?!
@@ -18,3 +18,6 @@ TODO
 - [x] multiple queries, single connect
 - [ ] reformat query format --> inverted query debug
 - [ ] distinguish public/private class/instance methods
+- [ ] general clean up / restructure
+- [ ] add verbose / debug mode / output
+- [ ] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up
