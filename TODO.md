@@ -1,16 +1,20 @@
 TODO
-- [ ] merge office modifications
+- [x] merge office modifications
 - [ ] Instance separtion when using same connection class --> count problems
-- [ ] add some docs
-- [ ] add lincens
+- [x] add some docs
+- [ ] add some more docs
+- [x] add lincens --> is MIT the best solution?
 - [ ] add alias for get: fetch
-- [ ] find solution for nested queries (nested query string insertion --> hashtag --> no escape?!) --> Kbam class functions? --> empty after .slq call?
+- [x] find solution for nested queries (nested query string insertion --> hashtag --> no escape?!) --> Kbam class functions? --> empty after .slq call?
+- [ ] finish implementing nested queries
 - [ ] query hooks? insert raw sql in between query?!
 - [ ] separate statement compose?! --> e.g. only where clause --> usage?
 - [x] query + execute
 - [ ] insert
+- [ ] update
 - [x] group, having
 - [ ] check security
 - [ ] kbam class functions for query string composition
 - [x] multiple queries, single connect
 - [ ] reformat query format --> inverted query debug
+- [ ] distinguish public/private class/instance methods

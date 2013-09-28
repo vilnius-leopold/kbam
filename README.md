@@ -32,19 +32,35 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 
 ## Examples
 
-#### Nested queries
+#### Nested where
 ```ruby
-	nested_where = Kbam.new.where('user_name = ?', 'Olympia').and('id = ?', 120)
+nested_where = Kbam.new.where(:user_name, 'Olympia').and(:id >= 120)
 
-	comment_query = Kbam.new.from(:comments)
-		.limit(10)
-		.order(:created)
-		.where('user_name = ?', 'john').or(nested_where)
-	
-	#=> SELECT * FROM comments WHERE user_name = 'john' OR (user_name = 'Olympia' AND id = 120) ORDER BY `created` ASC LIMIT 10
+Kbam.new.from(:comments)
+	.where("user_name = ?", 'john')
+	.or(nested_where)
 
-	#Isn't that f***ing awesome!?
+#=> SELECT SQL_CALC_FOUND_ROWS * FROM comments
+# WHERE `user_name` = 'john' OR (`user_name` = 'Olympia' AND `id` >= 120)
+```
 
+#### Subquery
+```ruby
+sub_query = Kbam.new.from(:comments).select(:user_name, :id, :created)
+
+Kbam.new.from(sub_query.as("sub_table"))
+
+#=> SELECT * FROM (
+# SELECT user_name, id, created FROM comments LIMIT 1000 
+# ) AS sub_table
+```
+
+#### Syntax sugar (still experimental)
+```ruby
+# you can use >= <= < > in where clauses 
+Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
+
+#=> SELECT * FROM comments WHERE `user_name` = 'Olympia' AND `id` >= 120
 ```
 
 ## Functions

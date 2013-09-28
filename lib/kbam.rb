@@ -2,23 +2,12 @@
 
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
+require_relative 'class_tweaks' # provides insanely simple syntax
 
-class String
-
-	@sql_where_type = "and" # :and, :or
-
-	def sql_where_type
-		puts "GET WHERE: #{@sql_where_type}"
-		@sql_where_type
-	end
-
-	def set_sql_where_type(type)
-		@sql_where_type = type
-		puts "SET WHERE: #{@sql_where_type}"
-	end
-end
 
 class Kbam
+	attr_reader :is_nested
+  	attr_writer :is_nested
 	
 	@@client = nil
 	@@wheres = Array.new
@@ -43,7 +32,8 @@ class Kbam
 		@limit 		= 1000
 		@offset 	= 0
 		@query 		= "" #raw query
-
+		@as 		= "t"
+		@is_nested	= false
 
 		# meta data
 		@last_query = nil
@@ -102,6 +92,8 @@ class Kbam
 		@@client.query(@query)
 	end
 
+
+
 	def select(*fields)
 		fields = *fields.to_a
 
@@ -111,7 +103,7 @@ class Kbam
 			#puts field
 
 			#remove preceeding and trailing whitespaces and comma
-			cleaned_select = field.gsub(/\s*\n\s*/, ' ').to_s.sub(/^\s*,?\s*/, '').sub(/\s*,?\s*$/, '')#.gsub(/\s*,\s*/, ", ")
+			cleaned_select = field.to_s.gsub(/\s*\n\s*/, ' ').to_s.sub(/^\s*,?\s*/, '').sub(/\s*,?\s*$/, '')#.gsub(/\s*,\s*/, ", ")
 
 			#back-quote fieldnames
 			cleaned_select.gsub! /(\w+)(?=\s+AS\s+)/ do |match|
@@ -130,8 +122,27 @@ class Kbam
 
 	end
 
+	def as(table_name = nil)
+		if table_name != nil
+			@as = table_name
+			return self
+		else
+			return @as 
+		end
+	end	
+
+
+
 	def from(from_string)
-		@from = from_string
+		if from_string.respond_to?(:name)
+			if from_string.name == "Kbam"
+				from_string.is_nested = true
+				@from = "(#{from_string.compose_query}) AS #{from_string.as}"			
+			end
+		else
+			@from = from_string
+		end
+
 
 		return self
 	end
@@ -142,25 +153,41 @@ class Kbam
 		return self
 	end
 
+	def escape(string)
+		Mysql2::Client.escape string.to_s
+	end
+
+	alias_method :esc, :escape
+
 	# where API
 	def where(string, *value)
 
-		#puts "WHERE public input: #{value}"
-
 		values = *value.to_a
 
-		where_statement = replace(string, values)
+		#puts "WHERE public input: #{value}"
+		if string.sql_prop != nil && string.sql_value != nil
+			where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
+		elsif string !~ /\?/ && values.length == 1
+			where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
 
-		if string =~ /\s+or\s+/i
+		else
 
-			where_statement	= "(#{where_statement})"
+			
+
+			where_statement = replace(string, values)
+
+			if string =~ /\s+or\s+/i
+
+				where_statement	= "(#{where_statement})"
+			end
+
+			
 		end
 
 		if where_statement != ""
 			where_statement.set_sql_where_type("and")
 			@wheres.push where_statement
 		end
-
 		#puts "WHERE after public input: #{where_statement}"
 
 		return self
@@ -394,6 +421,8 @@ class Kbam
 		return @result
 	end
 
+	alias_method :fetch, :get
+
 	# if instance method 
 	# then interferes with 
 	# Array.each implementation!
@@ -543,11 +572,18 @@ class Kbam
 	# Query composers #
 
 	def compose_select
-		unless @selects.empty?
-			return "SELECT SQL_CALC_FOUND_ROWS #{(@selects * ', ')}"
-		else
-			return "SELECT *"
+		select_string = "SELECT "
+		unless is_nested
+			select_string += "SQL_CALC_FOUND_ROWS "
 		end
+
+		unless @selects.empty?
+			select_string += "#{(@selects * ', ')}"
+		else
+			select_string += "*"
+		end
+
+		return select_string
 	end
 
 	def compose_from
