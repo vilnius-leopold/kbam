@@ -32,6 +32,37 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - nested queries
 - K'bam! has rich syntax and alias functions - use it as you like
 
+## Usage
+```ruby
+# your database credentials
+db_credentials = {:host => 'localhost', :database => 'db_name', :username => 'root', :password => 'Kbam_roX!'}
+
+#Let K'bam! connect to the database
+Kbam.connect(db_credentials)
+
+# compose your query
+comment_query = Kbam.new.from(:comments)
+	.order(:created, :desc)
+	.where(:user_name, 'leo')
+	.limit(10)
+
+# fetch the comments
+comments = comment_query.get
+# you can also ommit .get
+# and just run .each, it will do the same
+
+# count comments 
+total_comments = comment_query.total
+count_comments = comment_query.count
+
+# print the result
+comments.each do |comment|
+	puts comment
+end
+
+```
+
+
 ## Examples
 
 #### Nested where
@@ -139,6 +170,10 @@ Aliases
 # retrieves posts
 posts = Kbam.new.from("posts").get
 #=> 10
+
+# you can also do
+.get(:hash), .get(:array), .get(:json)
+# hash is default
 ```
 Aliases  
 `.fetch`
