@@ -2,7 +2,8 @@ K'bam!
 ======
 
 ## Description
-K'bam! is MySQL query string builder, featuring statement chaining and ?-escaping.
+K'bam! is MySQL query string builder featuring statement chaining, nesting and sanatization.  
+K'bam is still in developement but you can test it already. I'd be happy about your feedback.
 
 ### What it does
 
@@ -29,6 +30,7 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - K'bam! is fast and does't constrain you.
 - K'bam! has no uneccassary overhead and provides full access and suport for MySQL through the mysql2 apdater.
 - nested queries
+- K'bam! has rich syntax and alias functions - use it as you like
 
 ## Examples
 
@@ -40,7 +42,7 @@ Kbam.new.from(:comments)
 	.where("user_name = ?", 'john')
 	.or(nested_where)
 
-#=> SELECT SQL_CALC_FOUND_ROWS * FROM comments
+#=> SELECT * FROM comments
 # WHERE `user_name` = 'john' OR (`user_name` = 'Olympia' AND `id` >= 120)
 ```
 
@@ -108,6 +110,26 @@ Aliases
 Aliases  
 `.or`  
 `.where_or`
+
+#### limit
+
+```ruby
+
+.limit(10)
+
+#=> LIMIT 10
+
+# default limit 1000
+
+```
+#### offset
+
+```ruby
+
+.offset(50)
+
+#=> OFFSET 10
+```
 
 ### Retrieving Functions
 
