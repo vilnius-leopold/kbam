@@ -2,9 +2,9 @@
 
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
-#require_relative 'class_tweaks' # provides insanely simple syntax
+#require "anbt-sql-formatter/formatter" #for sql beautifying
+
 require_relative 'kbam/extension'
-#require_relative 'kbam/sugar'
 
 class Kbam
 	attr_reader :is_nested
@@ -97,19 +97,15 @@ class Kbam
 
 	# REVIEW: right approach?
 	# needed when nesting queries --> class checking
-	def self.name
-		return "Kbam"
-	end
+	# def self.name
+	# 	return "Kbam"
+	# end
 
 	# REVIEW: double check usage
 	def self.clear
 		@@wheres = Array.new
 	end
 
-	# DEPRECATED
-	# def self.get_wheres
-	# 	@@wheres
-	# end
 
 	# FIXME: add symbole to string
 	#   and decimal numbers
@@ -142,7 +138,7 @@ class Kbam
 		replaced_string = string.gsub(/\?/) do |match|
 			if i > 0 
 				if values[i] != nil
-					last_value = replacement = sanatize values[i]
+					last_value = replacement = self.class.sanatize values[i]
 				else
 					replacement = last_value					
 				end
@@ -150,7 +146,7 @@ class Kbam
 				unless values[i] != nil
 					puts "missing argument!"
 				else
-					last_value = replacement  = sanatize values[i]
+					last_value = replacement  = self.class.sanatize values[i]
 				end
 			end
 
@@ -229,17 +225,16 @@ class Kbam
 
 	
 	def from(from_string = nil)
-		if from_string != nil && from_string.to_s.strip! != ""
-			if from_string.respond_to?(:name)
-				if from_string.name == "Kbam"
-					from_string.is_nested = true
-					@from = "(#{from_string.compose_query}\n   )AS #{from_string.as}"			
-				end
-			else
-				@from = from_string
-			end
+
+		if from_string.class.name == "Kbam"
+			from_string.is_nested = true
+			@from = "(#{from_string.compose_query}\n   )AS #{from_string.as}"				
 		else
-			error "missing table"
+			if from_string != nil && from_string.to_s.strip! != ""			
+				@from = from_string
+			else
+				error "missing table"
+			end
 		end
 
 		return self
@@ -255,28 +250,19 @@ class Kbam
 		return self
 	end
 
-	# DEPRECATED
-	def escape(string)
-		warning "deprecated! use class function instead"
-		Mysql2::Client.escape string.to_s
+	# add class alias
+	class << self
+	  	alias :esc :escape
 	end
-
-	alias_method :esc, :escape
 
 	# where API
 	def where(string, *value)
 
 		values = *value.to_a
 
+		#log string.class.name, "and log"		
 
-
-		if string.respond_to?(:name)
-			if string.name == "Kbam"	
-				is_kbam = true
-			end
-		end
-
-		if is_kbam
+		if string.class.name == "Kbam"
 
 			where_string = ""
 
@@ -293,7 +279,7 @@ class Kbam
 				i += 1
 			end
 
-			puts "NESTED WHERE: #{where_string}"
+			#puts "NESTED WHERE: #{where_string}"
 
 			if where_string =~ /\s+OR\s+/i
 
@@ -307,9 +293,9 @@ class Kbam
 		else
 			#puts "WHERE public input: #{value}"
 			if string.respond_to?(:sql_prop) && (string.sql_prop != nil && string.sql_value != nil)
-				where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
+				where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"			
 			elsif string !~ /\?/ && values.length == 1
-				where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
+				where_statement = "`#{self.class.escape string.to_s}` = #{self.class.sanatize values[0]}"
 
 			else
 				where_statement = replace(string, values)
@@ -342,9 +328,9 @@ class Kbam
 	
 
 	# REVIEW: right approach?
-	def name
-		return "Kbam"
-	end
+	# def name
+	# 	return "Kbam"
+	# end
 
 	def clear
 		@@wheres = Array.new
@@ -353,21 +339,9 @@ class Kbam
 		# where API
 	def or_where(string, *value)
 
-		#puts "WHERE public input: #{value}"
-
 		values = *value.to_a
 
-		puts "WHERE CLASS: #{string.class.name}"
-
-		is_kbam = false
-
-		if string.respond_to?(:name)
-			if string.name == "Kbam"	
-				is_kbam = true
-			end
-		end
-
-		if is_kbam
+		if string.class.name == "Kbam"
 
 			where_string = ""
 
@@ -393,14 +367,13 @@ class Kbam
 			where_string.set_sql_where_type("or")
 			@wheres.push where_string
 			string.clear
-
 		
 		else
 
 			if string.sql_prop != nil && string.sql_value != nil
-				or_where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
+				or_where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"			
 			elsif string !~ /\?/ && values.length == 1
-				or_where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
+				or_where_statement = "`#{self.class.escape string.to_s}` = #{self.class.sanatize values[0]}"
 			else
 				or_where_statement = replace(string, values)
 			end
@@ -416,10 +389,7 @@ class Kbam
 			end
 		end
 
-		#puts "WHERE after public input: #{or_where_statement}"
-
 		return self
-
 	end
 
 	alias_method :where_or, :or_where
@@ -442,9 +412,7 @@ class Kbam
 			@havings.push having_statement
 		end
 
-
 		return self
-
 	end
 
 	def order(field, direction = nil)
@@ -522,11 +490,6 @@ class Kbam
 	def get(format = "hash")
 
 		format = format.to_s
-
-		# @wheres.each do |w|
-		# 	#puts "test"
-		# 	#puts "GET where: #{w.sql_where_type}"
-		# end
 		
 		case format
 		when "json"
@@ -582,20 +545,11 @@ class Kbam
 	alias_method :length, :count
 
 	def total
-		# unless @count_query == nil
-		# 	total =  @@client.query(@count_query).first["count"]
-		# 	puts "TOTAL COUNT: #{total}"
-		# 	return total
-		# else
-		# 	error "Can't execute Kbam::count before Kbam::get or Kbam::each"
-		# 	return nil
-		# end
 		if @result != nil
 			@@client.query("SELECT FOUND_ROWS() AS count").first["count"]
 		else
 			warning "Can't count total for empty result"
-		end
-		
+		end		
 	end
 
 	#FIXME: raw sql conflict and if not composed yet...
@@ -615,45 +569,6 @@ class Kbam
 
 	##################
 	# Public helpers #
-
-	# DEPRECATED
-	# sanatize string
-	def sanatize(item)
-		warning "DEPRECATED: use class method"
-		if item.is_a?(Integer)
-			item = item.to_i
-		else
-			item.strip!
-			if item =~ /\A\d+\Z/ # \A \Z (for entire string) instaed of ^ and $ --> newline insecurity
-				item = item.to_i
-			else
-				item = "'#{Mysql2::Client.escape(item)}'"
-				#item = "'#{item}'"
-			end
-		end
-
-		return item
-	end
-
-	
-
-	# #sanatization not safe yet!!!
-	# # sanatize text
-	# def sanatize_text(item)
-	# 	if item.is_a?(Integer)
-	# 		item = item.to_i
-	# 	else
-	# 		item.strip!
-	# 		if item =~ /^\d+$/
-	# 			item = item.to_i
-	# 		else
-	# 			item = "'#{item.gsub(/\\/, '\&\&').gsub(/'/, "''")}'"
-	# 			#item = "'#{item}'"
-	# 		end
-	# 	end
-
-	# 	return item
-	# end
 
 	#FIXME: change to class method
 	# sanatize field
@@ -794,12 +709,11 @@ class Kbam
 			compose_offset
 		] * ' '
 
-		log(query_string, "query")
-
+		unless is_nested
+			log(query_string, "query")
+		end
 
 		@last_query = query_string
-
-		#puts "COUNT QUERY: #{count_query}"
 
 		return query_string
 
@@ -824,8 +738,8 @@ class Kbam
 	# creates warning
 	# continues execution
 	def warning(message)
-		warning_message = " WARNING: #{message}! "
-		warning_length = warning_message.length
+		warning_message = " #{caller[0]} WARNING: #{message}! "
+		warning_length = [warning_message.length, 80].min
 		puts ("="*warning_length).colorize( :color => :yellow, :background => :white )
 		puts warning_message.colorize( :color => :yellow, :background => :white )
 		puts ("="*warning_length).colorize( :color => :yellow, :background => :white )
@@ -842,9 +756,8 @@ class Kbam
 		fill = color_width - title_length
 
 		log_message = "#{message}"
-		#log_length = log_message.length
-		puts ("-"*color_width).colorize( :color => :black, :background => :white )
-		
+
+		puts ("-"*color_width).colorize( :color => :black, :background => :white )		
 		puts "#{title.upcase}:#{" " * (fill - 1)}".colorize( :color => :black, :background => :white )
 		puts ("-"*color_width).colorize( :color => :black, :background => :white )
 		puts log_message.colorize( :color => :black, :background => :white )
@@ -867,7 +780,7 @@ class Kbam
 
 			if i > 0 
 				if values[i] != nil
-					last_value = replacement = sanatize values[i]
+					last_value = replacement = self.class.sanatize values[i]
 				else
 					replacement = last_value					
 				end
@@ -875,7 +788,7 @@ class Kbam
 				unless values[i] != nil
 					puts "missing argument!"
 				else
-					last_value = replacement  = sanatize values[i]
+					last_value = replacement  = self.class.sanatize values[i]
 				end
 			end
 
@@ -890,4 +803,4 @@ class Kbam
 
 	
 
-end
+end #END Kbam class

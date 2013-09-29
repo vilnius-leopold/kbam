@@ -1,23 +1,29 @@
 TODO
+----
+
 - [x] merge office modifications
-- [ ] Instance separtion when using same connection class --> count problems
 - [x] add some docs
-- [ ] add some more docs
+- [x] find solution for nested queries (nested query string insertion --> hashtag --> no escape?!) --> Kbam class functions? --> empty after .slq call?
 - [x] add lincens --> is MIT the best solution?
 - [x] add alias for get: fetch
-- [x] find solution for nested queries (nested query string insertion --> hashtag --> no escape?!) --> Kbam class functions? --> empty after .slq call?
+- [x] query + execute
+- [x] group, having
+- [x] multiple queries, single connect
+- [x] finish implementing nested where
+	- [ ] refractor and double check syntax, redundancies
+- [ ] add verbose / debug mode / output
+	- [x] added error, warning, log 
+- [ ] make first (alpha) release
+- [ ] add entire docs
+- [ ] Instance separtion when using same connection class --> count problems
 - [ ] finish implementing nested queries
 - [ ] query hooks? insert raw sql in between query?!
 - [ ] separate statement compose?! --> e.g. only where clause --> usage?
-- [x] query + execute
 - [ ] insert
 - [ ] update
-- [x] group, having
 - [ ] check security
 - [ ] kbam class functions for query string composition
-- [x] multiple queries, single connect
 - [ ] reformat query format --> inverted query debug
 - [ ] distinguish public/private class/instance methods
 - [ ] general clean up / restructure
-- [ ] add verbose / debug mode / output
 - [ ] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up
