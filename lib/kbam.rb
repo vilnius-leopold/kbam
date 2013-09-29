@@ -107,7 +107,7 @@ class Kbam
 	end
 
 	# DEPRECATED
-	# def self.get_class_wheres
+	# def self.get_wheres
 	# 	@@wheres
 	# end
 
@@ -120,7 +120,7 @@ class Kbam
 			if item.is_a?(Integer)
 				item = item.to_i
 			else
-				item.strip!
+				item.to_s.strip!
 				if item =~ /\A\d+\Z/
 					item = item.to_i
 				else
@@ -206,8 +206,8 @@ class Kbam
 
 			#back-quote fieldnames
 			# before NO '?<field>''
-			cleaned_select.gsub! /(?<db_field>\w+)(?=\s+AS\s+)/ do |match|
-				"#{field_sanatize(db_field)}" #before 'field' was '$1'
+			cleaned_select.gsub! /(\w+)(?=\s+AS\s+)/ do |match|
+				"#{field_sanatize($1)}" #before 'field' was '$1'
 			end
 
 			@selects.push(cleaned_select)
@@ -229,7 +229,7 @@ class Kbam
 
 	
 	def from(from_string = nil)
-		if from_string != nil && from_string.strip! != ""
+		if from_string != nil && from_string.to_s.strip! != ""
 			if from_string.respond_to?(:name)
 				if from_string.name == "Kbam"
 					from_string.is_nested = true
@@ -268,30 +268,63 @@ class Kbam
 
 		values = *value.to_a
 
-		#puts "WHERE public input: #{value}"
-		if string.sql_prop != nil && string.sql_value != nil
-			where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
-		elsif string !~ /\?/ && values.length == 1
-			where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
 
-		else
 
-			
+		if string.respond_to?(:name)
+			if string.name == "Kbam"	
+				is_kbam = true
+			end
+		end
 
-			where_statement = replace(string, values)
+		if is_kbam
 
-			if string =~ /\s+or\s+/i
+			where_string = ""
 
-				where_statement	= "(#{where_statement})"
+			i = 0
+			string.get_wheres.each do |w|
+				if i > 0
+					if w.sql_where_type == "or"
+						where_string += " OR "
+					else
+						where_string += " AND "
+					end
+				end
+				where_string += "#{w}\n   "
+				i += 1
 			end
 
-			
+			puts "NESTED WHERE: #{where_string}"
+
+			if where_string =~ /\s+OR\s+/i
+
+				where_string	= "(#{where_string})"
+			end
+			where_string.set_sql_where_type("and")
+			@wheres.push where_string
+			string.clear
+
+		
+		else
+			#puts "WHERE public input: #{value}"
+			if string.respond_to?(:sql_prop) && (string.sql_prop != nil && string.sql_value != nil)
+				where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
+			elsif string !~ /\?/ && values.length == 1
+				where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
+
+			else
+				where_statement = replace(string, values)
+				if string =~ /\s+or\s+/i
+					where_statement	= "(#{where_statement})"
+				end			
+			end
+
+			if where_statement != ""
+				where_statement.set_sql_where_type("and")
+				@wheres.push where_statement
+			end
 		end
 
-		if where_statement != ""
-			where_statement.set_sql_where_type("and")
-			@wheres.push where_statement
-		end
+		
 		#puts "WHERE after public input: #{where_statement}"
 
 		return self
@@ -299,39 +332,12 @@ class Kbam
 	end
 
 	alias_method :and, :where
-
-	# DEPRECATED
-	# def self.where(string, *value)
-
-	# 	#puts "WHERE public input: #{value}"
-
-	# 	values = *value.to_a
-
-	# 	where_statement = replace(string, values)
-
-	# 	if string =~ /\s+or\s+/i
-
-	# 		where_statement	= "(#{where_statement})"
-	# 	end
-
-	# 	if where_statement != ""
-	# 		where_statement.set_sql_where_type("and")
-	# 		@@wheres.push where_statement
-	# 	end
-
-	# 	#puts "WHERE after public input: #{where_statement}"
-
-	# 	return self
-
-	# end
-
-
 	
 
 	# DEPRECATED
-	# def get_class_wheres
-	# 	@wheres
-	# end
+	def get_wheres
+		@wheres
+	end
 
 	
 
@@ -349,16 +355,24 @@ class Kbam
 
 		#puts "WHERE public input: #{value}"
 
-			values = *value.to_a
+		values = *value.to_a
 
-			puts "WHERE CLASS: #{string.class.name}"
+		puts "WHERE CLASS: #{string.class.name}"
 
-		if string.name == "Kbam"
+		is_kbam = false
+
+		if string.respond_to?(:name)
+			if string.name == "Kbam"	
+				is_kbam = true
+			end
+		end
+
+		if is_kbam
 
 			where_string = ""
 
 			i = 0
-			string.get_class_wheres.each do |w|
+			string.get_wheres.each do |w|
 				if i > 0
 					if w.sql_where_type == "or"
 						where_string += " OR "
@@ -366,7 +380,7 @@ class Kbam
 						where_string += " AND "
 					end
 				end
-				where_string += "#{w}"
+				where_string += "#{w}\n   "
 				i += 1
 			end
 
@@ -379,9 +393,17 @@ class Kbam
 			where_string.set_sql_where_type("or")
 			@wheres.push where_string
 			string.clear
+
+		
 		else
 
-			or_where_statement = replace(string, values)
+			if string.sql_prop != nil && string.sql_value != nil
+				or_where_statement = "`#{escape string.to_s}` #{string.sql_prop} #{sanatize string.sql_value}"			
+			elsif string !~ /\?/ && values.length == 1
+				or_where_statement = "`#{escape string.to_s}` = #{sanatize values[0]}"
+			else
+				or_where_statement = replace(string, values)
+			end
 
 			if string =~ /\s+AND\s+/i
 
@@ -807,8 +829,6 @@ class Kbam
 		puts ("="*warning_length).colorize( :color => :yellow, :background => :white )
 		puts warning_message.colorize( :color => :yellow, :background => :white )
 		puts ("="*warning_length).colorize( :color => :yellow, :background => :white )
-		
-		Kernel::raise error_message
 	end
 
 	# prints debug info / log
@@ -841,7 +861,7 @@ class Kbam
 		i = 0
 		last_value = nil
 
-		replaced_string = string.gsub(/\?/) do |match|
+		replaced_string = string.to_s.gsub(/\?/) do |match|
 
 
 
