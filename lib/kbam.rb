@@ -8,11 +8,16 @@ require_relative 'kbam/extension'
 
 class Kbam
 	attr_reader :is_nested
-  	attr_writer :is_nested
-	
-	@@client = nil	
+	attr_writer :is_nested
+
+	@@client = nil
 	@@sugar = false
-	
+
+	# query_types
+	SELECT = 0
+	INSERT = 1
+	UPDATE = 2
+
 	#REVIEW/FIXME: remove instance connect?!
 	# create instance connection --> for multiple database connections
 	# maybe add settings --> allow separate client connections for each instance
@@ -20,37 +25,37 @@ class Kbam
 	# override default class connection if exists --> class fallback
 	def initialize(login_credentials = nil)
 
-		
 		if login_credentials != nil
-			warning "avoid connecting to the database for each instance"	
-			connect(login_credentials)			
-		end		
+			warning "avoid connecting to the database for each instance"
+			connect(login_credentials)
+		end
 
 		# query credentials
-		@selects 	= Array.new
-		@from 		= ""
-		@wheres 	= Array.new
-		@or_wheres 	= Array.new
-		@group		= ""
-		@havings	= Array.new
-		@orders 	= Array.new
-		@limit 		= 1000
-		@offset 	= 0
-		@query 		= "" #raw query
-		@as 		= "t"
-		
+		@selects   = Array.new
+		@from      = ""
+		@wheres    = Array.new
+		@or_wheres = Array.new
+		@group     = ""
+		@havings   = Array.new
+		@orders    = Array.new
+		@limit     = 1000
+		@offset    = 0
+		@query     = "" #raw query
+		@as        = "t"
+		@into      = ""
+		@insert    = {}
 
 		# meta data
-		@last_query = nil		
-		@result = nil
-		@is_nested	= false
+		@last_query = nil
+		@result     = nil
+		@is_nested  = false
+		@query_type = SELECT
 		#@count_query = nil
 
-		
 		# offer block syntax
 		if block_given?
-	      	yield self
-	   	end
+			yield self
+		end
 
 	end
 
@@ -64,7 +69,7 @@ class Kbam
 	### Class methods ###
 
 	# explicitly connect to database
-	def self.connect(login_credentials = nil)		
+	def self.connect(login_credentials = nil)
 		if login_credentials != nil
 			if @@client == nil
 				@@client = Mysql2::Client.new(login_credentials)
@@ -83,15 +88,15 @@ class Kbam
 
 	# sets sugar
 	# REVIEW: add .no_sugar! if possible
-	# or instance dependet sugar? 
+	# or instance dependet sugar?
 	def self.sugar_please!
 		@@sugar = true
 		require_relative 'kbam/sugar'
 	end
 
-	# escapes string 
+	# escapes string
 	# uses native mysql2 client
-	def self.escape(string = nil)		
+	def self.escape(string = nil)
 		Mysql2::Client.escape string.to_s
 	end
 
@@ -136,11 +141,11 @@ class Kbam
 		last_value = nil
 
 		replaced_string = string.gsub(/\?/) do |match|
-			if i > 0 
+			if i > 0
 				if values[i] != nil
 					last_value = replacement = self.class.sanatize values[i]
 				else
-					replacement = last_value					
+					replacement = last_value
 				end
 			else
 				unless values[i] != nil
@@ -151,7 +156,7 @@ class Kbam
 			end
 
 			i += 1
-			replacement			
+			replacement
 		end
 
 		return replaced_string
@@ -172,7 +177,7 @@ class Kbam
 
 		values = *value.to_a
 
-		query_statement = replace(string, values)		
+		query_statement = replace(string, values)
 
 		if query_statement != ""
 			@query = query_statement
@@ -194,8 +199,8 @@ class Kbam
 	# FIXME: check nil / empty
 	def select(*fields)
 		fields = *fields.to_a
-		
-		fields.each do |field|			
+
+		fields.each do |field|
 
 			#remove preceeding and trailing whitespaces and comma
 			cleaned_select = field.to_s.gsub(/\s*\n\s*/, ' ').to_s.sub(/\A\s*,?\s*/, '').sub(/\s*,?\s*\Z/, '')#.gsub(/\s*,\s*/, ", ")
@@ -218,19 +223,107 @@ class Kbam
 			@as = table_name
 			return self
 		else
-			return @as 
+			return @as
 		end
-	end	
+	end
 
+	def insert(value_pair)
 
-	
+		@query_type = INSERT
+
+		columns = ""
+		values  = ""
+		column_count = 0
+
+		value_pair.each do |key, value|
+
+			if column_count != 0
+				values += ", "
+				columns += ", "
+			end
+
+			columns += "#{field_sanatize(key.to_s)}"
+			values  += "#{self.class.sanatize(value)}"
+
+			column_count += 1
+		end
+
+		@insert = " (#{columns}) VALUES (#{values})"
+
+		return self
+
+	end
+
+	def update(value_pair)
+
+		@query_type = UPDATE
+
+		@update = "SET "
+		column_count = 0
+
+		value_pair.each do |key, value|
+
+			if column_count != 0
+				@update += ", "
+			end
+
+			@update += "#{field_sanatize(key.to_s)} = #{self.class.sanatize(value)}"
+
+			column_count += 1
+
+		end
+
+		return self
+
+	end
+
+	# used together with 'insert'
+	def into(table)
+
+		if @query_type === INSERT
+			@into = "INSERT INTO #{field_sanatize(table)} "
+		elsif @query_type === UPDATE
+			@into = "UPDATE #{field_sanatize(table)}"
+		end
+
+		return self
+
+	end
+
+	def run
+
+		if @query_type === INSERT
+
+			# execute insert query
+			@query = "#{@into} #{@insert}"
+			execute
+
+			# return the insert_id
+			@query = "SELECT  LAST_INSERT_ID() AS insert_id;"
+			query_result = execute
+
+			insert_id = query_result.first["insert_id"]
+			return insert_id
+
+		elsif @query_type === UPDATE
+
+			# execute insert query
+			@query = "#{@into} #{@update} #{compose_where}"
+			execute
+
+			return true
+
+		end
+
+	end
+
 	def from(from_string = nil)
 
 		if from_string.class.name == "Kbam"
 			from_string.is_nested = true
-			@from = "(#{from_string.compose_query}\n   )AS #{from_string.as}"				
+			@from = "(#{from_string.compose_query}\n   )AS #{from_string.as}"
 		else
-			if from_string != nil && from_string.to_s.strip! != ""			
+			if from_string != nil && from_string.to_s.strip! != ""
 				@from = from_string
 			else
 				error "missing table"
@@ -252,7 +345,7 @@ class Kbam
 
 	# add class alias
 	class << self
-	  	alias :esc :escape
+		alias :esc :escape
 	end
 
 	# where API
@@ -260,7 +353,7 @@ class Kbam
 
 		values = *value.to_a
 
-		#log string.class.name, "and log"		
+		#log string.class.name, "and log"
 
 		if string.class.name == "Kbam"
 
@@ -289,11 +382,11 @@ class Kbam
 			@wheres.push where_string
 			string.clear
 
-		
+
 		else
 			#puts "WHERE public input: #{value}"
 			if string.respond_to?(:sql_prop) && (string.sql_prop != nil && string.sql_value != nil)
-				where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"			
+				where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"
 			elsif string !~ /\?/ && values.length == 1
 				where_statement = "`#{self.class.escape string.to_s}` = #{self.class.sanatize values[0]}"
 
@@ -301,7 +394,7 @@ class Kbam
 				where_statement = replace(string, values)
 				if string =~ /\s+or\s+/i
 					where_statement	= "(#{where_statement})"
-				end			
+				end
 			end
 
 			if where_statement != ""
@@ -310,7 +403,7 @@ class Kbam
 			end
 		end
 
-		
+
 		#puts "WHERE after public input: #{where_statement}"
 
 		return self
@@ -318,14 +411,14 @@ class Kbam
 	end
 
 	alias_method :and, :where
-	
+
 
 	# DEPRECATED
 	def get_wheres
 		@wheres
 	end
 
-	
+
 
 	# REVIEW: right approach?
 	# def name
@@ -367,11 +460,11 @@ class Kbam
 			where_string.set_sql_where_type("or")
 			@wheres.push where_string
 			string.clear
-		
+
 		else
 
 			if string.sql_prop != nil && string.sql_value != nil
-				or_where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"			
+				or_where_statement = "`#{self.class.escape string.to_s}` #{string.sql_prop} #{self.class.sanatize string.sql_value}"
 			elsif string !~ /\?/ && values.length == 1
 				or_where_statement = "`#{self.class.escape string.to_s}` = #{self.class.sanatize values[0]}"
 			else
@@ -420,9 +513,9 @@ class Kbam
 			direction = 'ASC'
 		end
 
-		@orders.push  "#{field_sanatize(field)} #{sort_sanatize(direction)}"
+		@orders.push "#{field_sanatize(field)} #{sort_sanatize(direction)}"
 
-		return self	
+		return self
 	end
 
 	def limit(limit_int = nil)
@@ -433,7 +526,7 @@ class Kbam
 			@limit = nil
 		end
 
-		return self	
+		return self
 	end
 
 	def offset(offset_int = nil)
@@ -444,7 +537,7 @@ class Kbam
 			@offset = nil
 		end
 
-		return self	
+		return self
 	end
 
 	#REVIEW: using << instead of += --> faster
@@ -464,7 +557,7 @@ class Kbam
 			# use id as json keys
 			json << "#{row["id"]}: {"
 
-				# remove id 
+				# remove id
 				row.delete("id")
 
 				#use rest of fields as json value
@@ -490,7 +583,7 @@ class Kbam
 	def get(format = "hash")
 
 		format = format.to_s
-		
+
 		case format
 		when "json"
 			#puts "FETCHING JSON"
@@ -499,16 +592,16 @@ class Kbam
 		when "array"
 			@result = @@client.query(compose_query, :as => :array)
 		else
-		  	@result = @@client.query(compose_query)
+			@result = @@client.query(compose_query)
 		end
-			
+
 		return @result
 	end
 
 	alias_method :fetch, :get
 
-	# if instance method 
-	# then interferes with 
+	# if instance method
+	# then interferes with
 	# Array.each implementation!
 	def each
 
@@ -532,7 +625,7 @@ class Kbam
 		end
 	end
 
-	#FIXME: 
+	#FIXME:
 	def count
 		if @result != nil
 			return @result.count
@@ -549,7 +642,7 @@ class Kbam
 			@@client.query("SELECT FOUND_ROWS() AS count").first["count"]
 		else
 			warning "Can't count total for empty result"
-		end		
+		end
 	end
 
 	#FIXME: raw sql conflict and if not composed yet...
@@ -659,7 +752,6 @@ class Kbam
 
 			return where_string
 
-
 		else
 			return ""
 		end
@@ -698,14 +790,16 @@ class Kbam
 	end
 
 	def compose_query
+
+		# join the query fragments
 		query_string = [
-			compose_select, 
-			compose_from, 
-			compose_where,			
+			compose_select,
+			compose_from,
+			compose_where,
 			compose_group,
 			compose_having,
 			compose_order,
-			compose_limit, 
+			compose_limit,
 			compose_offset
 		] * ' '
 
@@ -718,10 +812,10 @@ class Kbam
 		return query_string
 
 	end
-	
+
 
 	#####################
-	# Private functions #	
+	# Private functions #
 
 	# interrupts execution
 	# creates error output
@@ -731,7 +825,7 @@ class Kbam
 		puts ("="*error_length).colorize( :color => :red, :background => :white )
 		puts error_message.colorize( :color => :red, :background => :white )
 		puts ("="*error_length).colorize( :color => :red, :background => :white )
-		
+
 		Kernel::raise error_message
 	end
 
@@ -757,17 +851,17 @@ class Kbam
 
 		log_message = "#{message}"
 
-		puts ("-"*color_width).colorize( :color => :black, :background => :white )		
+		puts ("-"*color_width).colorize( :color => :black, :background => :white )
 		puts "#{title.upcase}:#{" " * (fill - 1)}".colorize( :color => :black, :background => :white )
 		puts ("-"*color_width).colorize( :color => :black, :background => :white )
 		puts log_message.colorize( :color => :black, :background => :white )
-		puts ("-"*color_width).colorize( :color => :black, :background => :white )	
+		puts ("-"*color_width).colorize( :color => :black, :background => :white )
 	end
 
-	
+
 
 	#takes only an array of values
-	def replace(string, values)		
+	def replace(string, values)
 
 		warning "DEPRECATED: use class method instead"
 
@@ -778,11 +872,11 @@ class Kbam
 
 
 
-			if i > 0 
+			if i > 0
 				if values[i] != nil
 					last_value = replacement = self.class.sanatize values[i]
 				else
-					replacement = last_value					
+					replacement = last_value
 				end
 			else
 				unless values[i] != nil
@@ -794,13 +888,13 @@ class Kbam
 
 			i += 1
 
-			replacement			
+			replacement
 		end
 
 		return replaced_string
 
 	end
 
-	
+
 
 end #END Kbam class
