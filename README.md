@@ -17,7 +17,11 @@ it turns this
 ```
 into this
 ```sql
-SELECT title, author, date, text FROM posts WHERE author = 'john' ORDER BY date ASC LIMIT 10 
+SELECT title, author, date, text 
+FROM posts 
+WHERE author = 'john' 
+ORDER BY date ASC 
+LIMIT 10 
 ```
 
 ## For whom is K'bam!?
@@ -35,7 +39,12 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 ## Usage
 ```ruby
 # your database credentials
-db_credentials = {:host => 'localhost', :database => 'db_name', :username => 'root', :password => 'Kbam_roX!'}
+db_credentials = {
+	:host     => 'localhost',
+	:database => 'db_name',
+	:username => 'root',
+	:password => 'Kbam_roX!'
+}
 
 #Let K'bam! connect to the database
 Kbam.connect(db_credentials)
@@ -125,8 +134,8 @@ Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
 #### where
 
 ```ruby
-string = "user_name = ?" 	# or also: "user_name = ? AND id = ?"
-vars = "john" 				# can take array, single and multiple arguments
+string = "user_name = ?" # or also: "user_name = ? AND id = ?"
+vars = "john"            # can take array, single and multiple arguments
 
 .where(string, vars)
 
@@ -164,7 +173,7 @@ Aliases
 
 .offset(50)
 
-#=> OFFSET 10
+#=> OFFSET 50
 ```
 
 ### Retrieving Functions

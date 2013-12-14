@@ -1,8 +1,9 @@
-# cat lib/kbam.rb
-
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
 #require "anbt-sql-formatter/formatter" #for sql beautifying
+#require 'bundler' # pulls in Gemfile dependencies
+
+#Bundler.require
 
 require_relative 'kbam/extension'
 
@@ -59,8 +60,6 @@ class Kbam
 
 	end
 
-
-
 	##############
 	# Pulbic API #
 	##############
@@ -110,7 +109,6 @@ class Kbam
 	def self.clear
 		@@wheres = Array.new
 	end
-
 
 	# FIXME: add symbole to string
 	#   and decimal numbers
@@ -162,7 +160,6 @@ class Kbam
 		return replaced_string
 	end
 
-
 	########################
 	### Instance methods ###
 
@@ -194,7 +191,6 @@ class Kbam
 
 		@@client.query(@query)
 	end
-
 
 	# FIXME: check nil / empty
 	def select(*fields)
@@ -382,7 +378,6 @@ class Kbam
 			@wheres.push where_string
 			string.clear
 
-
 		else
 			#puts "WHERE public input: #{value}"
 			if string.respond_to?(:sql_prop) && (string.sql_prop != nil && string.sql_value != nil)
@@ -403,7 +398,6 @@ class Kbam
 			end
 		end
 
-
 		#puts "WHERE after public input: #{where_statement}"
 
 		return self
@@ -412,24 +406,22 @@ class Kbam
 
 	alias_method :and, :where
 
-
 	# DEPRECATED
 	def get_wheres
 		@wheres
 	end
-
-
 
 	# REVIEW: right approach?
 	# def name
 	# 	return "Kbam"
 	# end
 
+	# What is this? remove?
 	def clear
 		@@wheres = Array.new
 	end
 
-		# where API
+	# where API
 	def or_where(string, *value)
 
 		values = *value.to_a
@@ -578,8 +570,6 @@ class Kbam
 		return json
 	end
 
-
-
 	def get(format = "hash")
 
 		format = format.to_s
@@ -604,7 +594,6 @@ class Kbam
 	# then interferes with
 	# Array.each implementation!
 	def each
-
 
 		#puts "OBJECT TYPE: #{self.class}"
 
@@ -658,8 +647,6 @@ class Kbam
 	alias_method :to_str, :sql
 	alias_method :to_sql, :sql
 
-
-
 	##################
 	# Public helpers #
 
@@ -691,8 +678,6 @@ class Kbam
 			return 'ASC'
 		end
 	end
-
-
 
 	#####################
 	# PRIVATE FUNCTIONS #
@@ -813,7 +798,6 @@ class Kbam
 
 	end
 
-
 	#####################
 	# Private functions #
 
@@ -858,8 +842,6 @@ class Kbam
 		puts ("-"*color_width).colorize( :color => :black, :background => :white )
 	end
 
-
-
 	#takes only an array of values
 	def replace(string, values)
 
@@ -869,8 +851,6 @@ class Kbam
 		last_value = nil
 
 		replaced_string = string.to_s.gsub(/\?/) do |match|
-
-
 
 			if i > 0
 				if values[i] != nil
@@ -894,7 +874,5 @@ class Kbam
 		return replaced_string
 
 	end
-
-
 
 end #END Kbam class

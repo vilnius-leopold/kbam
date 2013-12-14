@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'kbam'
-  s.version     = '0.1.0'
+  s.version     = '0.2.0'
   s.date        = '2013-09-21'
   s.summary     = "K'bam!"
   s.description = "Simple gem that makes working with raw MySQL in Ruby efficient and fun! It's basically a query string builder (not an ORM!) that takes care of sanatization and sql chaining. Only supports SELECT statements (currently?)."
