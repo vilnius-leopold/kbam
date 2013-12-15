@@ -661,6 +661,22 @@ class Kbam
 		end
 	end
 
+	def Kbam.sanatize_field!(dirty_string)
+		dirty_string.replace(Kbam.sanatize_field(dirty_string))
+
+		nil
+	end
+
+	# for sanatizing fields, tables
+	def Kbam.sanatize_field(dirty_string)
+		unless dirty_string.respond_to? :to_s
+			raise ArgumentError,
+				"Cannot convert #{dirty_string.class} into a String"
+		end
+
+		'`' << dirty_string.to_s.gsub(/[^a-zA-Z0-9_]/, '') << '`'
+	end
+
 	#FIXME: change to class method
 	# senatize sort e.g. asc / desc
 	def sort_sanatize(sort)
