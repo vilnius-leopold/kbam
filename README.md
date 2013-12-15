@@ -1,6 +1,9 @@
 K'bam!
 ======
-**NOTE:** When I published the gem on rubygems.org, people actually downloaded it. What I didn't expect to be frank. I'm still having problems wrapping it up into a nice gem. For that reason I yanked the kbam gem for now. I'll fix the kbam gem and push a new release when I find time. Remember kbam is still in development - the API might change soon.
+**NOTE:** When I published the gem on rubygems.org, people actually downloaded it. What I didn't expect to be frank. I'm still having problems wrapping it up into a nice gem though.
+<!-- For that reason I yanked the kbam gem for now. I'll fix the kbam gem and push a new release when I find time.
+-->
+Remember K'bam is still in development - the API will very likely change soon.
 
 ## Description
 K'bam! is MySQL query string builder featuring statement chaining, nesting and sanatization.  
