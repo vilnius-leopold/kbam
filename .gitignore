@@ -2,6 +2,7 @@ testing/*
 kbam.sublime-workspace
 kbam.sublime-project
 server
+my.thoughts
 
 *.gem
 *.rbc
