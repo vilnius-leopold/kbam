@@ -2,10 +2,10 @@
 
 Gem::Specification.new do |spec|
   spec.name        = 'kbam'
-  spec.version     = "0.3.2"
+  spec.version     = "0.3.3-alpha"
   spec.date        = '2013-09-21'
-  spec.summary     = "K'bam!"
-  spec.description = "Simple gem that makes working with raw MySQL in Ruby efficient and fun! It's basically a query string builder (not an ORM!) that takes care of sanatization and sql chaining."
+  spec.summary     = "K'bam! UNSTABLE - only for testing!"
+  spec.description = "Simple gem that makes working with raw MySQL in Ruby efficient and fun! It's basically a query string builder (not an ORM!) that takes care of sanatization and sql chaining. UNSTABLE - only for testing!"
   spec.authors     = ["Leopold Burdyl"]
   spec.email       = 'nerd@whiteslash.eu'
   spec.files       = ["lib/kbam.rb"]
