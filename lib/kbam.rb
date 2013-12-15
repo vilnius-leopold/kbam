@@ -1,7 +1,7 @@
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
 
-require_relative 'kbam/extension'
+require 'kbam/extension'
 
 class Kbam
 	attr_reader :is_nested
@@ -86,7 +86,7 @@ class Kbam
 	# or instance dependet sugar?
 	def self.sugar_please!
 		@@sugar = true
-		require_relative 'kbam/sugar'
+		require 'kbam/sugar'
 	end
 
 	# escapes string
