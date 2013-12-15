@@ -1,6 +1,8 @@
 K'bam!
 ======
 
+**NOTE:** When I published the gem on rubygems.org, people actually downloaded it. What I didn't expect to be frank. I'm still having problems wrapping it up into a nice gem. For that reason I yanked the kbam gem for now. I'll fix the kbam gem and push a new release when I find time. Remember kbam is still in development - the API might change soon.
+
 ## Description
 K'bam! is MySQL query string builder featuring statement chaining, nesting and sanatization.  
 K'bam is still in developement but you can test it already. I'd be happy about your feedback.
@@ -45,6 +47,8 @@ gem install kbam
 
 ## Usage
 ```ruby
+require 'kbam'
+
 # your database credentials
 db_credentials = {
 	:host     => 'localhost',
@@ -104,7 +108,7 @@ Kbam.new.from(sub_query.as("sub_table"))
 #      LIMIT 1000 
 #   ) AS sub_table
 ```
-
+<!--
 #### Syntax sugar (still experimental)
 ```ruby
 # you can use >= <= < > in where clauses
@@ -117,7 +121,7 @@ Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
 
 #=> SELECT * FROM comments WHERE `user_name` = 'Olympia' AND `id` >= 120
 ```
-
+-->
 ## Functions
 
 ### Composing Functions
