@@ -1,9 +1,26 @@
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
+#puts "test include extention"
+#require 'kbam/extension.rb'
 
-require_relative 'kbam/extension'
+# string extension
+class String
+
+	@sql_where_type = "and" # :and, :or
+
+	def sql_where_type
+		#puts "GET WHERE: #{@sql_where_type}"
+		@sql_where_type
+	end
+
+	def set_sql_where_type(type)
+		@sql_where_type = type
+		#puts "SET WHERE: #{@sql_where_type}"
+	end
+end
 
 class Kbam
+
 	attr_reader :is_nested
 	attr_writer :is_nested
 
@@ -86,7 +103,7 @@ class Kbam
 	# or instance dependet sugar?
 	def self.sugar_please!
 		@@sugar = true
-		require_relative 'kbam/sugar'
+		require 'kbam/sugar'
 	end
 
 	# escapes string
@@ -659,6 +676,22 @@ class Kbam
 		else
 			error("invalid field name")
 		end
+	end
+
+	def Kbam.sanatize_field!(dirty_string)
+		dirty_string.replace(Kbam.sanatize_field(dirty_string))
+
+		nil
+	end
+
+	# for sanatizing fields, tables
+	def Kbam.sanatize_field(dirty_string)
+		unless dirty_string.respond_to? :to_s
+			raise ArgumentError,
+				"Cannot convert #{dirty_string.class} into a String"
+		end
+
+		'`' << dirty_string.to_s.gsub(/[^a-zA-Z0-9_]/, '') << '`'
 	end
 
 	#FIXME: change to class method
