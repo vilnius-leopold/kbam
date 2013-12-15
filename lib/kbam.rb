@@ -1,9 +1,5 @@
 require 'mysql2'   #the sql adapter
 require 'colorize' #for error coloring ;)
-#require "anbt-sql-formatter/formatter" #for sql beautifying
-#require 'bundler' # pulls in Gemfile dependencies
-
-#Bundler.require
 
 require_relative 'kbam/extension'
 

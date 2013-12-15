@@ -5,15 +5,14 @@ K'bam!
 K'bam! is MySQL query string builder featuring statement chaining, nesting and sanatization.  
 K'bam is still in developement but you can test it already. I'd be happy about your feedback.
 
-### What it does
-
+## What it does
 it turns this 
 ```ruby
-	Kbam.new.from('posts')
-		.select('title, author, date, text')
-		.limit(10)
-		.order('date') 
-		.where('author = ?', 'john')
+Kbam.new.from('posts')
+    .select('title, author, date, text')
+    .limit(10)
+    .order('date') 
+    .where('author = ?', 'john')
 ```
 into this
 ```sql
@@ -27,7 +26,7 @@ LIMIT 10
 ## For whom is K'bam!?
 K'bam! is for those that feel comfortable with raw SQL statements, but don't want to go into the effort of sanatizing every variable and want to enjoy the convenience of random (order) statement chaining.
 
-##Features
+## Features
 - random (order) statement chaining
 - variable sanatization
 - you are not forced to use any defined database structure as required by many ORMs
@@ -35,6 +34,14 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - K'bam! has no uneccassary overhead and provides full access and suport for MySQL through the mysql2 apdater.
 - nested queries
 - K'bam! has rich syntax and alias functions - use it as you like
+
+## Install
+**NOTE:** Kbam is still in pre/alpha-release state. Not fir for production yet!  
+
+via ruby gems:
+```
+gem install kbam
+```
 
 ## Usage
 ```ruby
@@ -68,9 +75,7 @@ count_comments = comment_query.count
 comments.each do |comment|
 	puts comment
 end
-
 ```
-
 
 ## Examples
 
@@ -83,7 +88,8 @@ Kbam.new.from(:comments)
 	.or(nested_where)
 
 #=> SELECT * FROM comments
-# WHERE `user_name` = 'john' OR (`user_name` = 'Olympia' AND `id` >= 120)
+#   WHERE `user_name` = 'john' 
+#   OR (`user_name` = 'Olympia' AND `id` >= 120)
 ```
 
 #### Subquery
@@ -93,8 +99,10 @@ sub_query = Kbam.new.from(:comments).select(:user_name, :id, :created)
 Kbam.new.from(sub_query.as("sub_table"))
 
 #=> SELECT * FROM (
-# SELECT user_name, id, created FROM comments LIMIT 1000 
-# ) AS sub_table
+#      SELECT user_name, id, created 
+#      FROM comments 
+#      LIMIT 1000 
+#   ) AS sub_table
 ```
 
 #### Syntax sugar (still experimental)
@@ -129,7 +137,6 @@ Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
 #=> SELECT *
 
 ```
-
 
 #### where
 
