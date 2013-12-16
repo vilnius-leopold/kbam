@@ -1,7 +1,7 @@
 K'bam!
 ======
-**NOTE:** When I published the gem on rubygems.org, people actually downloaded it. What I didn't expect to be frank. I'm still having problems wrapping it up into a nice gem though.
-<!-- For that reason I yanked the kbam gem for now. I'll fix the kbam gem and push a new release when I find time.
+<!-- **NOTE:** When I published the gem on rubygems.org, people actually downloaded it. What I didn't expect to be frank. I'm still having problems wrapping it up into a nice gem though.
+For that reason I yanked the kbam gem for now. I'll fix the kbam gem and push a new release when I find time.
 -->
 Remember K'bam is still in development - the API will very likely change soon.
 
