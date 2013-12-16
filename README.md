@@ -39,15 +39,12 @@ K'bam! is for those that feel comfortable with raw SQL statements, but don't wan
 - nested queries
 - K'bam! has rich syntax and alias functions - use it as you like
 
-<!--
-## Install
-**NOTE:** Kbam is still in pre/alpha-release state. Not fir for production yet!  
 
+## Install
 via ruby gems:
 ```
 gem install kbam
 ```
--->
 
 ## Usage
 ```ruby

@@ -1,26 +1,11 @@
-require 'mysql2'   #the sql adapter
-require 'colorize' #for error coloring ;)
-#puts "test include extention"
-#require 'kbam/extension.rb'
+require 'mysql2'   # the sql adapter
+require 'colorize' # for error coloring ;)
 
-# string extension
-class String
-
-	@sql_where_type = "and" # :and, :or
-
-	def sql_where_type
-		#puts "GET WHERE: #{@sql_where_type}"
-		@sql_where_type
-	end
-
-	def set_sql_where_type(type)
-		@sql_where_type = type
-		#puts "SET WHERE: #{@sql_where_type}"
-	end
-end
+# Kbam class / modules
+require 'kbam/version.rb'
+require 'kbam/extension.rb'
 
 class Kbam
-
 	attr_reader :is_nested
 	attr_writer :is_nested
 
@@ -103,7 +88,7 @@ class Kbam
 	# or instance dependet sugar?
 	def self.sugar_please!
 		@@sugar = true
-		require 'kbam/sugar'
+		require 'kbam/sugar.rb'
 	end
 
 	# escapes string
