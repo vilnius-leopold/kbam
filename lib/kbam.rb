@@ -11,6 +11,7 @@ class Kbam
 
 	@@client = nil
 	@@sugar = false
+	@@verbose = true
 
 	# query_types
 	SELECT = 0
@@ -82,6 +83,10 @@ class Kbam
 	# check if has syntax sugar
 	def self.sugar?
 		return @@sugar
+	end
+
+	def self.verbose(value)
+		@@verbose = value
 	end
 
 	# sets sugar
@@ -185,8 +190,10 @@ class Kbam
 	# REVIEW/DEPRECATED ?
 	# FIXME: query auto execute? --> get?
 	# FIXME: needs response/callback!
-	def execute()
-		log(@query, "raw sql")
+	def execute
+		if @@verbose
+			log(@query, "raw sql")
+		end
 
 		@@client.query(@query)
 	end
@@ -799,7 +806,9 @@ class Kbam
 		] * ' '
 
 		unless is_nested
-			log(query_string, "query")
+			if @@verbose
+				log(query_string, "query")
+			end
 		end
 
 		@last_query = query_string
