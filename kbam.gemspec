@@ -3,8 +3,8 @@ require File.expand_path('../lib/kbam/version', __FILE__)
 Gem::Specification.new do |spec|
   spec.name        = 'kbam'
   spec.version     = Kbam::VERSION
-  spec.date        = '2013-12-16'
-  spec.summary     = "K'bam! UNSTABLE - only for testing!"
+  spec.date        = '2014-01-15'
+  spec.summary     = "K'bam!"
   spec.description = "Simple gem that makes working with raw MySQL in Ruby efficient and fun! It's basically a query string builder (not an ORM!) that takes care of sanatization and sql chaining."
   spec.authors     = ["Leopold Burdyl"]
   spec.email       = 'nerd@whiteslash.eu'

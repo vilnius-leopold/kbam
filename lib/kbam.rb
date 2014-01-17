@@ -43,6 +43,7 @@ class Kbam
 		@as        = "t"
 		@into      = ""
 		@insert    = {}
+		@insert_ignore = "" # will create a INSERT IGNORE statement 
 
 		# meta data
 		@last_query = nil
@@ -221,8 +222,12 @@ class Kbam
 		end
 	end
 
-	def insert(value_pair)
+	def ignore
+		@insert_ignore = "IGNORE"
+		return self
+	end
 
+	def insert(value_pair)
 		@query_type = INSERT
 
 		columns = ""
@@ -245,7 +250,6 @@ class Kbam
 		@insert = " (#{columns}) VALUES (#{values})"
 
 		return self
-
 	end
 
 	def update(value_pair)
@@ -273,21 +277,17 @@ class Kbam
 
 	# used together with 'insert'
 	def into(table)
-
 		if @query_type === INSERT
-			@into = "INSERT INTO #{field_sanatize(table)} "
+			@into = "INSERT #{@insert_ignore} INTO #{field_sanatize(table)} "
 		elsif @query_type === UPDATE
 			@into = "UPDATE #{field_sanatize(table)}"
 		end
 
 		return self
-
 	end
 
 	def run
-
 		if @query_type === INSERT
-
 			# execute insert query
 			@query = "#{@into} #{@insert}"
 			execute
@@ -298,17 +298,13 @@ class Kbam
 
 			insert_id = query_result.first["insert_id"]
 			return insert_id
-
 		elsif @query_type === UPDATE
-
 			# execute insert query
 			@query = "#{@into} #{@update} #{compose_where}"
 			execute
 
 			return true
-
 		end
-
 	end
 
 	def from(from_string = nil)
