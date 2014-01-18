@@ -12,9 +12,9 @@ TODO
 - [x] update
 - [x] finish implementing nested where
 	- [ ] refractor and double check syntax, redundancies
-- [ ] add verbose / debug mode / output
+- [x] add verbose / debug mode / output
 	- [x] added error, warning, log 
-- [ ] make first (alpha) release
+- [x] make first (alpha) release
 - [ ] add entire docs
 - [ ] Instance separtion when using same connection class --> count problems
 - [ ] finish implementing nested queries
@@ -29,4 +29,4 @@ TODO
 - [ ] reformat query format --> inverted query debug
 - [ ] distinguish public/private class/instance methods
 - [ ] general clean up / restructure
-- [ ] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up
+- [x] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up ==> SUCKS
