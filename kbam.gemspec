@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.date        = Date.today.strptime("%Y-%m-%d")
   spec.summary     = "K'bam!"
   spec.description = "Simple gem that makes working with raw MySQL in Ruby efficient and fun! It's basically a query string builder (not an ORM!) that takes care of sanatization and sql chaining."
-  spec.authors     = ["Leopold Burdyl"]
+  spec.author      = "Leopold Burdyl"
   spec.email       = 'nerd@whiteslash.eu'
   spec.files       = Dir["lib/**/**"]
   spec.homepage    = 'https://github.com/vilnius-leopold/kbam'
