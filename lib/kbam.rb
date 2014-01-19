@@ -69,12 +69,16 @@ class Kbam
 	### Class methods ###
 
 	# explicitly connect to database
-	def self.connect(login_credentials = nil)
+	def self.connect(login_credentials = nil, environment = nil)
 		if login_credentials != nil
 
 			if @@client == nil
 				if login_credentials.is_a?(String) && login_credentials =~ /.+\.yml/
 					login_credentials = YAML.load_file(login_credentials)
+					
+					if environment != nil && login_credentials.has_key?(environment.to_s)
+						login_credentials = login_credentials[environment.to_s]
+					end
 				end
 
 				@@client = Mysql2::Client.new(login_credentials)
