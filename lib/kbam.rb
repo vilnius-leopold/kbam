@@ -1,5 +1,6 @@
 require 'mysql2'   # the sql adapter
 require 'colorize' # for error coloring ;)
+require 'yaml'
 
 # Kbam class / modules
 require 'kbam/version.rb'
@@ -70,7 +71,12 @@ class Kbam
 	# explicitly connect to database
 	def self.connect(login_credentials = nil)
 		if login_credentials != nil
+
 			if @@client == nil
+				if login_credentials.is_a? 'String' && login_credentials =~ /.+\.yml/
+					login_credentials = YAML.load_file(login_credentials)
+				end
+
 				@@client = Mysql2::Client.new(login_credentials)
 			else
 				warning "you are already connected!"
