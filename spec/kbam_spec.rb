@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe Kbam do	
 	before :all do
-		Kbam.connect("#{Dir.pwd}/spec/database.yml")
+		Kbam.connect("#{Dir.pwd}/spec/database.yml", :testing)
 		#Kbam.verbose false
 	end
 

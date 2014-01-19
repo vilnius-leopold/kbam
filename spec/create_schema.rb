@@ -1,7 +1,7 @@
 require 'yaml'
 
 # read database credentials
-db_credentials = YAML.load_file("#{Dir.pwd}/spec/database.yml")
+db_credentials = YAML.load_file("#{Dir.pwd}/spec/database.yml")["testing"]
 db_credentials["password"].gsub('!', "'!'")
 # puts "CREDENTIALS:\n#{db_credentials}\n"
 
