@@ -45,6 +45,11 @@ via ruby gems:
 ```
 gem install kbam
 ```
+Kbam relies on the [mysql2 gem](https://github.com/brianmario/mysql2). You need to have mysql installed on your machine to be able to use kbam. Furthermore, sometimes you'll need to install `libmysqlclient-dev` to satisfy mysql2 dependencies.  
+For Linux (apt-get based distros like Ubuntu, Debian...)
+```bash
+sudo apt-get install libmysqlclient-dev
+```
 
 ## Usage
 ```ruby
@@ -109,7 +114,7 @@ Kbam.new.from(sub_query.as("sub_table"))
 #      LIMIT 1000 
 #   ) AS sub_table
 ```
-<!--
+
 #### Syntax sugar (still experimental)
 ```ruby
 # you can use >= <= < > in where clauses
@@ -122,7 +127,7 @@ Kbam.new.from(:comments).where(:user_name, 'Olympia').and(:id >= 120)
 
 #=> SELECT * FROM comments WHERE `user_name` = 'Olympia' AND `id` >= 120
 ```
--->
+
 ## Functions
 
 ### Composing Functions
@@ -188,7 +193,41 @@ Aliases
 #=> OFFSET 50
 ```
 
-### Retrieving Functions
+#### insert / into
+
+```ruby
+Kbam.new
+    .insert({:user_name => 'John', age => 68})
+    .into(:users)
+    .run  # execute the function
+
+#=> INSERT INTO `users` (`user_name`, `age`)
+#   VALUES ('John', 68)
+```
+
+#### ignore
+
+```ruby
+Kbam.new
+    .insert({:user_name => 'John', age => 68})
+    .ignore
+    .into(:users)
+    .run
+
+#=> INSERT IGNORE INTO `users` (`user_name`, `age`)
+#   VALUES ('John', 68)
+```
+
+#### query
+
+```ruby
+# run raw sql query
+Kbam.new
+    .query("SELECT * FROM comments LIMIT ?", 10)
+    .execute
+```
+
+### Retrieving / executing Functions
 
 #### get
 
@@ -203,6 +242,23 @@ posts = Kbam.new.from("posts").get
 ```
 Aliases  
 `.fetch`
+
+#### run
+
+```ruby
+Kbam.new
+    .insert({:user_name => 'John', age => 68})
+    .into(:users)
+    .run
+```
+
+#### execute
+
+```ruby
+Kbam.new
+    .query("SELECT * FROM comments LIMIT 10")
+    .execute
+```
 
 #### each
 
