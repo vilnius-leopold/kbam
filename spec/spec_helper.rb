@@ -1,2 +1,3 @@
-require '../lib/kbam.rb'
-require './create_schema.rb'
+require_relative '../lib/kbam.rb'
+require_relative 'create_schema.rb'
+

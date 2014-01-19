@@ -1,11 +1,11 @@
 require 'yaml'
 
 # read database credentials
-db_credentials = YAML.load_file('database.yml')
+db_credentials = YAML.load_file("#{Dir.pwd}/spec/database.yml")
 db_credentials["password"].gsub('!', "'!'")
 # puts "CREDENTIALS:\n#{db_credentials}\n"
 
-script_direcotry = "database"
+script_direcotry = "#{Dir.pwd}/spec/database"
 scheme_script = "#{script_direcotry}/scheme.sql"
 
 command_string = "mysql -u#{db_credentials["username"]} -p#{db_credentials["password"]} -e"
