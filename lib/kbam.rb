@@ -73,7 +73,7 @@ class Kbam
 		if login_credentials != nil
 
 			if @@client == nil
-				if login_credentials.is_a? 'String' && login_credentials =~ /.+\.yml/
+				if login_credentials.is_a? String && login_credentials =~ /.+\.yml/
 					login_credentials = YAML.load_file(login_credentials)
 				end
 
