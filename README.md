@@ -66,6 +66,14 @@ db_credentials = {
 #Let K'bam! connect to the database
 Kbam.connect(db_credentials)
 
+# Or use a yaml file
+# 
+# host:     localhost
+# database: db_name
+# username: root
+# password: Kbam_roX!
+Kbam.connect('/path/to/database.yml')
+
 # compose your query
 comment_query = Kbam.new.from(:comments)
 	.order(:created, :desc)
