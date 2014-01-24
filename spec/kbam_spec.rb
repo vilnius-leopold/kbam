@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'json'
 
 
 describe Kbam do	
@@ -12,14 +13,14 @@ describe Kbam do
 	end
 
 	describe "#from" do
-		it "should return all results from the table for all syntaxes" do
+		it "should return all rows of the specifyed table when used alone" do
 			i = 0
 			ref_result = nil
 
 			[
-				Kbam.new.from(:comments).limit(1).order(:id, :asc),
-				Kbam.new.from("comments").limit(1).order(:id, :desc),
-				Kbam.new.from("`comments`").limit(1).order(:id, :asc)#,
+				Kbam.new.from(:comments),
+				Kbam.new.from("comments"),
+				Kbam.new.from("`comments`")#,
 				# Kbam.new.from("?", "comments"),
 				# Kbam.new.from("?", :comments),
 				# Kbam.new.from("?", "`comments`"),
@@ -27,20 +28,42 @@ describe Kbam do
 				# Kbam.new.from("`?`", :comments)
 			].each do |query|
 				result = []
+
 				query.get.each do |row|
 					result.push(row)
 				end
 
 				ref_result = result if i == 0
 
-				puts "#{result.inspect}"
-				puts "\nEQL: #{ref_result.uniq.sort == result.uniq.sort}\n"
-				
-				ref_result.size.should be result.size
-				ref_result.should match_array result
+				ref_result.to_json.should == result.to_json
+
+				i += 1
 			end
 
 			ref_result.size.should be > 0
+		end
+
+		it "should create the same query string for all syntaxes" do
+		end
+
+		it "should sanatize and backtick-quote table names" do
+		end
+
+		it "should be able to take on other query object for nesting" do 
+		end
+	end
+
+	describe "#select" do
+		it "should sanatize and backtick-quote fields" do
+		end
+
+		it "should generate the same query string for all syntaxes" do
+		end
+
+		it "should recognize AS alias statements" do 
+		end
+
+		it "should allow the use of SQL functions" do
 		end
 	end
 end
