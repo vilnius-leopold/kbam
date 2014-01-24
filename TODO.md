@@ -15,6 +15,10 @@ TODO
 - [x] add verbose / debug mode / output
 	- [x] added error, warning, log 
 - [x] make first (alpha) release
+- [ ] add delete
+- [ ] support CRUD
+- [ ] support pagination
+- [ ] make video tutorial
 - [ ] add entire docs
 - [ ] Instance separtion when using same connection class --> count problems
 - [ ] finish implementing nested queries
