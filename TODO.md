@@ -10,11 +10,21 @@ TODO
 - [x] multiple queries, single connect
 - [x] insert
 - [x] update
+- [x] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up ==> SUCKS
 - [x] finish implementing nested where
 	- [ ] refractor and double check syntax, redundancies
 - [x] add verbose / debug mode / output
 	- [x] added error, warning, log 
 - [x] make first (alpha) release
+- [x] add delete
+- [x] support CRUD
+- [ ] add execution of .sql file 
+- [ ] add success? and fail? methods --> feedback
+- [ ] decide on return values for update, insert, delete --> feedback
+- [ ] test CRUD operations
+- [ ] rewrite Docs to CRUD?
+- [ ] support pagination
+- [ ] make video tutorial
 - [ ] add entire docs
 - [ ] Instance separtion when using same connection class --> count problems
 - [ ] finish implementing nested queries
@@ -29,4 +39,3 @@ TODO
 - [ ] reformat query format --> inverted query debug
 - [ ] distinguish public/private class/instance methods
 - [ ] general clean up / restructure
-- [x] try / use https://github.com/sonota/anbt-sql-formatter for sql clean-up ==> SUCKS

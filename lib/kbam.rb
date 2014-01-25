@@ -18,6 +18,7 @@ class Kbam
 	SELECT = 0
 	INSERT = 1
 	UPDATE = 2
+	DELETE = 3
 
 	#REVIEW/FIXME: remove instance connect?!
 	# create instance connection --> for multiple database connections
@@ -32,20 +33,21 @@ class Kbam
 		end
 
 		# query credentials
-		@selects   = Array.new
-		@from      = ""
-		@wheres    = Array.new
-		@or_wheres = Array.new
-		@group     = ""
-		@havings   = Array.new
-		@orders    = Array.new
-		@limit     = 1000
-		@offset    = 0
-		@query     = "" #raw query
-		@as        = "t"
-		@into      = ""
-		@insert    = {}
+		@selects       = Array.new
+		@from          = ""
+		@wheres        = Array.new
+		@or_wheres     = Array.new
+		@group         = ""
+		@havings       = Array.new
+		@orders        = Array.new
+		@limit         = 1000
+		@offset        = 0
+		@query         = "" #raw query
+		@as            = "t"
+		@into          = ""
+		@insert        = {}
 		@insert_ignore = "" # will create a INSERT IGNORE statement 
+		@delete        = ""
 
 		# meta data
 		@last_query = nil
@@ -229,6 +231,22 @@ class Kbam
 		return self
 	end
 
+	# Sets the table name from which
+	# you want to delete rows from
+	# where or limit clause is required!
+	# 
+	# Sets the @delete object variable
+	# Sets the query type to be DELETE
+	# Sanatizes the table_name
+	# only single table paramter permitted
+	def delete(table_name = nil)
+		@delete = Kbam.sanatize_field(table_name)
+
+		@query_type = DELETE
+
+		return self
+	end
+
 	# setter and getter AS
 	def as(table_name = nil)
 		if table_name != nil
@@ -310,15 +328,27 @@ class Kbam
 			execute
 
 			# return the insert_id
-			@query = "SELECT  LAST_INSERT_ID() AS insert_id;"
+			@query = "SELECT LAST_INSERT_ID() AS insert_id;"
 			query_result = execute
 
 			insert_id = query_result.first["insert_id"]
+
+			# LAST_INSERT_ID() will return 0
+			# on INSERT IGNORE --> so better
+			# to return nil instead of 0
+			# to avoid confusion
+			insert_id = nil if insert_id == 0
+
 			return insert_id
 		elsif @query_type === UPDATE
 			# execute insert query
 			@query = "#{@into} #{@update} #{compose_where}"
 			execute
+
+			return true
+		elsif @query_type === DELETE
+			# execute insert query
+			@result = @@client.query(compose_delete_query)
 
 			return true
 		end
@@ -736,6 +766,14 @@ class Kbam
 		end
 	end
 
+	def compose_delete
+		unless @delete == ""
+			"\nDELTE FROM\n #{@delete}"
+		else
+			error('No delete table specifiyed')
+		end
+	end
+
 	def compose_group
 		unless @group == ""
 			"\nGROUP BY\n   #{@group}"
@@ -801,6 +839,7 @@ class Kbam
 		end
 	end
 
+	# Compose Select query
 	def compose_query
 
 		# join the query fragments
@@ -820,6 +859,28 @@ class Kbam
 				log(query_string, "query")
 			end
 		end
+
+		@last_query = query_string
+
+		return query_string
+
+	end
+
+	def compose_delete_query
+
+		# join the query fragments
+		query_string = [
+			compose_delete,
+			compose_where,
+			compose_order,
+			compose_limit
+		] * ' '
+
+		
+		if @@verbose
+			log(query_string, "query")
+		end
+		
 
 		@last_query = query_string
 
