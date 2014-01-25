@@ -10,9 +10,10 @@ class Kbam
 	attr_reader :is_nested
 	attr_writer :is_nested
 
-	@@client = nil
-	@@sugar = false
-	@@verbose = true
+	@@client        = nil
+	@@sugar         = false
+	@@verbose       = true
+	@@default_limit = 1000
 
 	# query_types
 	SELECT = 0
@@ -40,7 +41,7 @@ class Kbam
 		@group         = ""
 		@havings       = Array.new
 		@orders        = Array.new
-		@limit         = 1000
+		@limit         = nil # default is 1000
 		@offset        = 0
 		@query         = "" #raw query
 		@as            = "t"
@@ -768,7 +769,7 @@ class Kbam
 
 	def compose_delete
 		unless @delete == ""
-			"\nDELTE FROM\n #{@delete}"
+			"\nDELETE FROM\n #{@delete}"
 		else
 			error('No delete table specifiyed')
 		end
@@ -826,9 +827,13 @@ class Kbam
 	def compose_limit
 		unless @limit == nil
 			return "\nLIMIT #{@limit}"
-		else
-			return "\nLIMIT 1000"
 		end
+
+		if @query_type == DELETE
+			return ""
+		end
+	
+		return "\nLIMIT #{@@default_limit}"
 	end
 
 	def compose_offset
