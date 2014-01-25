@@ -12,6 +12,13 @@ describe Kbam do
 		@query = Kbam.new
 	end
 
+	describe ":verbose" do
+		it "should output the query to the console as default or when turned on else off" do
+
+		end
+	end
+
+
 	describe "#delete+#where" do
 		it "should delete all records from a table that fullfil the where condition" do
 			before_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
