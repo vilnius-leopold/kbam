@@ -18,6 +18,7 @@ TODO
 - [x] make first (alpha) release
 - [x] add delete
 - [x] support CRUD
+- [ ] add execution of .sql file 
 - [ ] add success? and fail? methods --> feedback
 - [ ] decide on return values for update, insert, delete --> feedback
 - [ ] test CRUD operations
