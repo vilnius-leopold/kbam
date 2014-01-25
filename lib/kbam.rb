@@ -328,10 +328,17 @@ class Kbam
 			execute
 
 			# return the insert_id
-			@query = "SELECT  LAST_INSERT_ID() AS insert_id;"
+			@query = "SELECT LAST_INSERT_ID() AS insert_id;"
 			query_result = execute
 
 			insert_id = query_result.first["insert_id"]
+
+			# LAST_INSERT_ID() will return 0
+			# on INSERT IGNORE --> so better
+			# to return nil instead of 0
+			# to avoid confusion
+			insert_id = nil if insert_id == 0
+
 			return insert_id
 		elsif @query_type === UPDATE
 			# execute insert query
