@@ -12,6 +12,36 @@ describe Kbam do
 		@query = Kbam.new
 	end
 
+	describe "#delete+#where" do
+		it "should delete all records from a table that fullfil the where condition" do
+			before_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
+			before_delete.should be > 0
+
+			Kbam.new.delete(:comments).where(:user_name, 'Maryam').run
+
+			after_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
+			after_delete.should be == 0
+		end
+	end
+
+	describe "#delete+#where+#limit" do
+		it "should only delete a limited amount of records from a table that fullfil the where condition" do
+			# restore database
+			# because previous tested deleted parts
+			setup_database
+
+			limit = 1
+
+			before_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
+			before_delete.should be > 0
+
+			Kbam.new.delete(:comments).where(:user_name, 'Maryam').limit(limit).run
+
+			after_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
+			after_delete.should be == before_delete - limit
+		end
+	end
+
 	describe "#from" do
 		it "should return all rows of the specifyed table when used alone" do
 			i = 0
