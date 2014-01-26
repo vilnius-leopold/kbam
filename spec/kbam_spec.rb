@@ -28,14 +28,15 @@ describe Kbam do
 
 			after_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
 			after_delete.should be == 0
+
+			# restore database
+			# because after delete statement
+			setup_database
 		end
 	end
 
 	describe "#delete+#where+#limit" do
 		it "should only delete a limited amount of records from a table that fullfil the where condition" do
-			# restore database
-			# because previous tested deleted parts
-			setup_database
 
 			limit = 1
 
@@ -46,6 +47,10 @@ describe Kbam do
 
 			after_delete = Kbam.new.from(:comments).where(:user_name, 'Maryam').get.count
 			after_delete.should be == before_delete - limit
+
+			# restore database
+			# because after delete statement
+			setup_database
 		end
 	end
 
@@ -87,6 +92,37 @@ describe Kbam do
 		end
 
 		it "should be able to take on other query object for nesting" do 
+		end
+	end
+
+	describe "SELECT statement" do
+		it "should create a valid statement even if the segments are chained randomly" do
+			big_select = Kbam.new.select(:user_name, :id)
+			                     .from(:comments)
+			                     .where(:user_name, 'Yasir')
+			                     .or_where(:user_name, 'Bell')
+			                     .group(:id)
+			                     .having(:user_name, 'Yasir')
+			                     .order(:created_at, :desc)
+			                     .limit(13)
+
+			big_select_reverse = Kbam.new.limit(13)
+			                     .order(:created_at, :desc)
+			                     .having(:user_name, 'Yasir')
+			                     .group(:id)
+			                     .or_where(:user_name, 'Bell')
+			                     .where(:user_name, 'Yasir')
+			                     .from(:comments)
+			                     .select(:user_name, :id)
+			                     
+			                     
+			big_select_reverse.to_s.should be == big_select.to_s
+			        
+			query_string = big_select.to_s.gsub(/[\n\s]+/m, " ").strip
+
+			reference_string "SELECT SQL_CALC_FOUND_ROWS `user_name`, `id` FROM `comments` WHERE `user_name` = 'Yasir' OR `user_name` = 'Bell' GROUP BY `id` HAVING `user_name` = 'Yasir' ORDER BY `created_at` DESC LIMIT 13"
+
+			query_string.should be == reference_string
 		end
 	end
 
