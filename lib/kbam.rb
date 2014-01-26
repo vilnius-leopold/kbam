@@ -829,7 +829,7 @@ class Kbam
 			return "\nLIMIT #{@limit}"
 		end
 
-		if @query_type == DELETE
+		if @query_type == DELETE || @query_type == UPDATE
 			return ""
 		end
 	
