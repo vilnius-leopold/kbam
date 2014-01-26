@@ -139,4 +139,43 @@ describe Kbam do
 		it "should allow the use of SQL functions" do
 		end
 	end
+
+	describe "UPDATE statement" do
+		it "should update table rows that match the where condition" do
+			limit = 1
+
+			Kbam.verbose true
+
+			before_update = Kbam.new
+			                    .from(:comments)
+			                    .where(:user_name, 'Bell')
+			                    .get.count
+
+			before_update2 = Kbam.new
+			                     .from(:comments)
+			                     .where(:user_name, 'John')
+			                     .get.count
+
+			Kbam.new.update({:user_name => 'John'})
+			        .into(:comments)
+			        .where(:user_name, 'Bell')
+			        .limit(limit)
+			        .run
+
+			after_update = Kbam.new
+			                   .from(:comments)
+			                   .where(:user_name, 'Bell')
+			                   .get.count
+
+			after_update2 = Kbam.new
+			                    .from(:comments)
+			                    .where(:user_name, 'John')
+			                    .get.count
+
+			Kbam.verbose false
+
+			after_update.should  be == (before_update  - limit)
+			after_update2.should be == (before_update2 + limit)
+		end
+	end
 end

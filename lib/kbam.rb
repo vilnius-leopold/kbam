@@ -343,7 +343,7 @@ class Kbam
 			return insert_id
 		elsif @query_type === UPDATE
 			# execute insert query
-			@query = "#{@into} #{@update} #{compose_where}"
+			@query = "#{@into} #{@update} #{compose_where} #{compose_limit}"
 			execute
 
 			return true
