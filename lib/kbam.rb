@@ -9,6 +9,8 @@ require 'kbam/extension.rb'
 class Kbam
 	attr_reader :is_nested
 	attr_writer :is_nested
+	attr_reader :no_count
+	attr_writer :no_count
 
 	@@client = nil
 	@@sugar = false
@@ -51,6 +53,7 @@ class Kbam
 		@last_query = nil
 		@result     = nil
 		@is_nested  = false
+		@no_count   = false
 		@query_type = SELECT
 		#@count_query = nil
 
@@ -634,10 +637,10 @@ class Kbam
 	alias_method :length, :count
 
 	def total
-		if @result != nil
+		if @result != nil && ! @no_count
 			@@client.query("SELECT FOUND_ROWS() AS count").first["count"]
 		else
-			warning "Can't count total for empty result"
+			warning "Can't count total for empty result. Or no count error."
 		end
 	end
 
@@ -711,7 +714,7 @@ class Kbam
 
 	def compose_select
 		select_string = "\nSELECT\n   "
-		unless is_nested
+		unless is_nested || @no_count
 			select_string += "SQL_CALC_FOUND_ROWS "
 		end
 
