@@ -21,9 +21,7 @@ module Kbam
 		end
 
 		def from(table_name)
-			unless @query_type == nil || @query_type == Kbam::QueryTypes::SELECT
-				raise "Query type already set to #{Kbam::QueryTypes.get_name(@query_type)}"
-			end
+			@query_type == nil || Kbam::QueryTypes.allow_method?(@query_type, __method__)
 
 			@query_type = Kbam::QueryTypes::SELECT 
 
@@ -32,9 +30,7 @@ module Kbam
 		end
 
 		def get
-			unless @query_type == Kbam::QueryTypes::SELECT
-				raise "Can't execute get on query_type #{Kbam::QueryTypes.get_name(@query_type)}"
-			end
+			@query_type == nil || Kbam::QueryTypes.allow_method?(@query_type, __method__)
 
 			select_query = Kbam::Composer.compose_query( get_query_params )
 

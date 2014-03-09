@@ -15,8 +15,7 @@ module Kbam
 			:group_by, 
 			:having, 
 			:limit, 
-			:get,
-			:to_sql
+			:get
 		]
 
 		def self.get_name(query_type)
