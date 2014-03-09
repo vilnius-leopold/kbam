@@ -70,8 +70,8 @@ module Kbam
 			return @client.sanatize(dirty_string)
 		end
 
-		def self.sanatize(dirty_string)
-			replace(@client.sanatize(dirty_string))
+		def self.sanatize!(dirty_string)
+			dirty_string.replace(@client.sanatize(dirty_string))
 		end
 	end
 end
