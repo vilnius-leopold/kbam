@@ -4,7 +4,7 @@ module Kbam
 			query_type = params[:query_type]
 
 			case query_type
-			when Kbam::Query::SELECT
+			when Kbam::QueryTypes::SELECT
 				return Composer.compose_select_query(params)
 			else
 				raise "Can't compose query string. Unknown query type #{query_type}"
