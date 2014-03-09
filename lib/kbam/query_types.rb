@@ -34,7 +34,9 @@ module Kbam
 		end
 
 		def self.allow_method?(query_type, method_name)
-			AllowedMethods[query_type].include?(method_name)
+			unless AllowedMethods[query_type].include?(method_name)
+				raise "Method #{method_name} is not allowed to be used inside of a #{Kbam::QueryTypes.get_name(query_type)} statement"
+			end
 		end
 	end
 end
