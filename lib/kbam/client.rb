@@ -33,6 +33,15 @@ module Kbam
 			return @@client.query(query_string)
 		end
 
+		def Client.close(query_string)
+			if @@client
+				@@client.close
+				@@client = nil
+			else
+				warn "Can't close non-existing connection."
+			end
+		end
+
 		
 		def Client.stringify_hash(hash)
 			unless hash && hash.is_a?(Hash)

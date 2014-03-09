@@ -4,12 +4,6 @@ describe Kbam::Client do
 
 	before do
 		@client = Kbam::Client
-		@credentials = { 
-			:host => :localhost, 
-			:pw   => "foodas4_the!sudas", 
-			:user => :root, 
-			:db   => :kbam_test_db 
-		}
 	end
 
 	it "should respond to #connect" do
@@ -22,7 +16,7 @@ describe Kbam::Client do
 
 	describe "::connect" do
 		it "should be able to connect to a database when passing in valid paramters" do
-			@client.connect(@credentials)
+			@client.connect(DatabaseCredentials)
 		end
 
 		it "it should fallback to default credentials if no other specified" do
@@ -54,7 +48,7 @@ describe Kbam::Client do
 
 	describe "::query" do
 		it "should be able to execute a query and return the Kbam Client result object" do
-			@client.connect(@credentials)
+			@client.connect(DatabaseCredentials)
 
 			result = @client.query("SELECT * FROM articles")
 
@@ -62,11 +56,17 @@ describe Kbam::Client do
 		end
 
 		it "should raise an error if you're not connected yet" do
-			
+			expect {
+				@client.close
+				@client.query("SELECT * FROM articles")
+			}.to raise_error
 		end
 
 		it "should raise an Kbam Client error when the query fails" do
-			
+			expect {
+				@client.connect(DatabaseCredentials)
+				@client.query("HOHOHO")
+			}.to raise_error
 		end
 	end
 
