@@ -6,6 +6,19 @@ module Kbam
 		DELETE = 2
 		UPDATE = 3
 
+		AllowedMethods = {}
+		AllowedMethods[SELECT] = [
+			:select, 
+			:from, 
+			:where, 
+			:order_by, 
+			:group_by, 
+			:having, 
+			:limit, 
+			:get,
+			:to_sql
+		]
+
 		def self.get_name(query_type)
 			case query_type
 			when SELECT
@@ -19,6 +32,10 @@ module Kbam
 			else
 				raise "Unknown name for query_type value #{query_type}"
 			end
+		end
+
+		def self.allow_method?(query_type, method_name)
+			AllowedMethods[query_type].include?(method_name)
 		end
 	end
 end
