@@ -52,7 +52,9 @@ describe Kbam::Client do
 
 			result = @client.query("SELECT * FROM articles")
 
-			result.should be_an_instance_of(Mysql2::Result)
+			# puts "RES: #{result.count}"
+
+			result.should be_an_instance_of(Kbam::Result)
 		end
 
 		it "should raise an error if you're not connected yet" do

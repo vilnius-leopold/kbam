@@ -7,11 +7,17 @@ describe Kbam::Query do
 
 	describe "SELECT queries" do
 		it "should return a result object" do
-			select_query = Kbam::Query.new
+			result = Kbam::Query.new.from("articles").get
 
-			result = select_query.from("articles").get
+			puts "RESULT: #{result.inspect}"
+			puts "RESULT: #{result.methods}"
+			#puts "RESULT: #{result.fields}"
 
-			result.should be_instance_of(Mysql2::Result)
+			result.each do |row|
+				puts "test #{row}"
+			end
+
+			result.should be_instance_of(Kbam::Result)
 		end
 	end
 end

@@ -30,7 +30,12 @@ module Kbam
 				raise "You didn't connect to any database yet. Can't execute query."
 			end
 
-			return @@client.query(query_string)
+
+			result = @@client.query(query_string)
+
+			puts "My2RES: #{result.inspect}"
+
+			return Kbam::Result.new(result)
 		end
 
 		def Client.close(query_string)
@@ -59,6 +64,14 @@ module Kbam
 			end
 
 			Hash[*hash_array]
+		end
+
+		def self.sanatize(dirty_string)
+			return @client.sanatize(dirty_string)
+		end
+
+		def self.sanatize(dirty_string)
+			replace(@client.sanatize(dirty_string))
 		end
 	end
 end
