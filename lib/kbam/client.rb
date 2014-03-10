@@ -13,16 +13,18 @@ module Kbam
 
 			login_credentials = Client.stringify_hash(login_credentials)
 
-			host     = login_credentials["host"] || login_credentials["hostname"] || login_credentials["h"]   || "127.0.0.1"
-			username = login_credentials["user"] || login_credentials["username"] || login_credentials["usr"] || login_credentials["u"] || "root"
-			password = login_credentials["password"] || login_credentials["pw"]   || login_credentials["p"]   || nil
-			database = login_credentials["database"] || login_credentials["db"]   || login_credentials["d"]   || nil
+			login_credentials["host"]     = login_credentials["host"] || login_credentials["hostname"] || login_credentials["h"]   || "127.0.0.1"
+			login_credentials["username"] = login_credentials["username"] || login_credentials["user"] || login_credentials["usr"] || login_credentials["u"] || "root"
+			login_credentials["password"] = login_credentials["password"] || login_credentials["pw"]   || login_credentials["p"]   || nil
+			login_credentials["database"] = login_credentials["database"] || login_credentials["db"]   || login_credentials["d"]   || nil
 
-			unless database 
+			unless login_credentials["database"] 
 				raise "No database specified" 
 			end
 
-			@@client = Mysql2::Client.new(:host => host, :username => username, :password => password, :database => database)
+			@@client = Mysql2::Client.new(login_credentials)
+
+			nil
 		end
 
 		def Client.query(query_string)
@@ -30,10 +32,7 @@ module Kbam
 				raise "You didn't connect to any database yet. Can't execute query."
 			end
 
-
 			result = @@client.query(query_string)
-
-			puts "My2RES: #{result.inspect}"
 
 			return Kbam::Result.new(result)
 		end
@@ -66,12 +65,20 @@ module Kbam
 			Hash[*hash_array]
 		end
 
+		def self.native
+			unless @@client
+				raise "Can't return native client of not connected yet."
+			end
+
+			return @@client
+		end
+
 		def self.sanatize(dirty_string)
-			return @client.sanatize(dirty_string)
+			return @client.escape(dirty_string)
 		end
 
 		def self.sanatize!(dirty_string)
-			dirty_string.replace(@client.sanatize(dirty_string))
+			dirty_string.replace(@client.escape(dirty_string))
 		end
 	end
 end

@@ -14,6 +14,19 @@ describe Kbam::Client do
 		@client.should respond_to :connect
 	end
 
+	it "should respond to #native" do
+		@client.should respond_to :native
+	end
+
+	it "#native should return Mysql2::Client object when connected or throw error" do
+		expect{
+			@client.native
+		}.to raise_error
+
+		@client.connect(DatabaseCredentials)
+		@client.native.should be_instance_of(Mysql2::Client)
+	end
+
 	describe "::connect" do
 		it "should be able to connect to a database when passing in valid paramters" do
 			@client.connect(DatabaseCredentials)

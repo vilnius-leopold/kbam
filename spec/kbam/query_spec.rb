@@ -9,14 +9,6 @@ describe Kbam::Query do
 		it "should return a result object" do
 			result = Kbam::Query.new.from("articles").get
 
-			puts "RESULT: #{result.inspect}"
-			puts "RESULT: #{result.methods}"
-			#puts "RESULT: #{result.fields}"
-
-			result.each do |row|
-				puts "test #{row}"
-			end
-
 			result.should be_instance_of(Kbam::Result)
 		end
 	end

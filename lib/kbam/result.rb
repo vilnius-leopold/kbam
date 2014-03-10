@@ -1,21 +1,25 @@
 module Kbam
-	class Result < Mysql2::Result
+	class Result
 		include Enumerable
 
 		def initialize (mysql2_result_object)
-			#kbam_result = mysql2_result_object.to_a
+			@mysql2_result = mysql2_result_object
+		end
 
-			# kbam_result.each do |row|
-			# 	puts "#{row}"
-			# end
+		def [](index)
+			unless @result_array
+				@result_array = @mysql2_result.to_a
+			end
 
-			@result = mysql2_result_object
+			return @result_array[index]
+		end
 
-			return @result
+		def native
+			return @mysql2_result
 		end
 
 		def each
-			@result.each do |row|
+			@mysql2_result.each do |row|
 				yield row
 			end
 		end

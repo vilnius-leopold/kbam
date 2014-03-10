@@ -7,7 +7,7 @@ require 'kbam/result'
 
 module Kbam
 	def self.new
-		return Kbam::Query.new
+		Kbam::Query.new
 	end
 
 	def self.connect(credentials)
@@ -15,6 +15,6 @@ module Kbam
 	end
 
 	def self.sanatize(dirty_string)
-		Kbam::Client.sanatize(dirty_string)
+		Kbam::Helpers.sanatize(dirty_string)
 	end
 end
