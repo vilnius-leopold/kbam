@@ -32,13 +32,6 @@ describe Kbam::Client do
 			@client.connect(DatabaseCredentials)
 		end
 
-		it "it should fallback to default credentials if no other specified" do
-			@client.connect({ 
-				:pw   => "foodas4_the!sudas", 
-				:db   => :kbam_test_db 
-			})
-		end
-
 		it "it should raise an Kbam Client error if no database is specified" do
 			expect {
 				@client.connect({ 

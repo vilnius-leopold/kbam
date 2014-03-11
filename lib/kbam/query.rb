@@ -29,6 +29,34 @@ module Kbam
 			return self
 		end
 
+		def insert(hash)
+			Kbam::QueryTypes.allow_method?(@query_type, __method__) if @query_type 
+
+			@query_type = Kbam::QueryTypes::INSERT
+
+			@insert = hash
+
+			return self
+		end
+
+		def into(table)
+			Kbam::QueryTypes.allow_method?(@query_type, __method__) if @query_type 
+
+			@query_type = Kbam::QueryTypes::INSERT
+
+			@into = table
+
+			return self
+		end
+
+		def where(field, value)
+			Kbam::QueryTypes.allow_method?(@query_type, __method__) if @query_type 
+
+			@where = "#{field.to_s} = #{Kbam::Helpers.sanatize(value)}"
+
+			return self
+		end
+
 		def get
 			Kbam::QueryTypes.allow_method?(@query_type, __method__) if @query_type 
 

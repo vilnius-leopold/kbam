@@ -17,6 +17,14 @@ module Kbam
 			:limit, 
 			:get
 		]
+		AllowedMethods[INSERT] = [
+			:insert, 
+			:into, 
+			:where,
+			:limit, 
+			:run,
+			:execute
+		]
 
 		def self.get_name(query_type)
 			case query_type

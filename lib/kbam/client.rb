@@ -13,11 +13,6 @@ module Kbam
 
 			login_credentials = Client.stringify_hash(login_credentials)
 
-			login_credentials["host"]     = login_credentials["host"] || login_credentials["hostname"] || login_credentials["h"]   || "127.0.0.1"
-			login_credentials["username"] = login_credentials["username"] || login_credentials["user"] || login_credentials["usr"] || login_credentials["u"] || "root"
-			login_credentials["password"] = login_credentials["password"] || login_credentials["pw"]   || login_credentials["p"]   || nil
-			login_credentials["database"] = login_credentials["database"] || login_credentials["db"]   || login_credentials["d"]   || nil
-
 			unless login_credentials["database"] 
 				raise "No database specified" 
 			end
